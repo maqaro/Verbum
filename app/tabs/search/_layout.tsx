@@ -7,7 +7,7 @@ export default function StackLayout() {
             name="index" 
             options={{ 
                 headerTitle: 'Search',
-                headerShown: true
+                headerShown: false
             }}
         />
     </Stack>
