@@ -13,7 +13,7 @@ export default function authScreen() {
     return (
     <>
         <Stack.Screen options={{headerShown:false}} />
-        <View className='flex-1 justify-center p-6'>
+        <View className='bg-background flex-1 justify-center p-6'>
             <Tabs
             value={tabValue}
             onValueChange={setTabValue}
@@ -46,8 +46,8 @@ export default function authScreen() {
                             </View>
                         </CardContent>
                         <CardFooter className="justify-center">
-                            <Button>
-                                <Text>Log In</Text>
+                            <Button className="bg-secondary">
+                                <Text className="text-primary">Log In</Text>
                             </Button>
                         </CardFooter>
                     </Card>
@@ -71,8 +71,8 @@ export default function authScreen() {
                             </View>
                         </CardContent>
                         <CardFooter className="justify-center">
-                            <Button>
-                                <Text>Create Account</Text>
+                            <Button className="bg-secondary">
+                                <Text className="text-primary">Create Account</Text>
                             </Button>
                         </CardFooter>
                     </Card>

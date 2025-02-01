@@ -19,7 +19,7 @@ const Profile = () => {
     return (
         <>
             <Stack.Screen options={{headerShown:false}} />
-            <Headerspace title="Profile"/>
+            <Headerspace/>
             <View id="profileHeader" className="bg-background flex-row items-center justify-between p-4">
                 <TouchableOpacity className="bg-secondary p-2 rounded-full">
                     <Settings className="color-primary"/>
@@ -29,10 +29,9 @@ const Profile = () => {
                     <UserPen className="color-primary"/>
                 </TouchableOpacity>
             </View>
-            <View className='bg-background flex-1 justify-center items-center p-6'>
+            <View className='bg-background flex-1 items-center p-6'>
                 <Card className="bg-background flex-1 items-center">
                     <Avatar alt="avatar" className="w-32 h-32 m-6">
-                        
                         <AvatarFallback>
                             <Text className="text-4xl font-bold text-foreground">PF</Text>
                         </AvatarFallback>
