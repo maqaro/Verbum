@@ -3,7 +3,6 @@ import React from "react";
 import { Stack } from "expo-router";
 import Headerspace from "~/components/HeaderSpace";
 import { Card, CardContent } from "~/components/ui/card";
-import { useState } from "react";
 import { Text } from "~/components/ui/text";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { Avatar, AvatarFallback } from "~/components/ui/avatar";
@@ -11,7 +10,7 @@ import RankBadge from "~/components/RankBadge";
 
 const Leaderboard = () => {
     const [tabValue, setTabValue] = React.useState('weekly');
-    const [refreshing, setRefreshing] = useState(false);
+    const [refreshing, setRefreshing] = React.useState(false);
     
     const onRefresh = React.useCallback(() => {
         setRefreshing(true);
@@ -46,7 +45,7 @@ const Leaderboard = () => {
                                 onRefresh={onRefresh} 
                                 refreshing={refreshing}
                             />
-                            <View className="flex-col w-full items-center">
+                            <View className="flex-col w-full items-center mt-4">
                                 <Card className="bg-card/90 w-full m-4">
                                     <CardContent className="flex-row items-center justify-between pb-0 p-4">
                                         <View className="flex-row items-center flex-1">
@@ -62,7 +61,7 @@ const Leaderboard = () => {
                                                 </Avatar>
                                             </View>
                                             <View className="flex-1">
-                                                <Text className="text-xl font-bold text-primary">Player Name</Text>
+                                                <Text className="text-2xl font-bold text-primary">Player Name</Text>
                                                 <Text className="text-primary/50 font-bold">Points: 590</Text>
                                             </View>
                                         </View>
@@ -70,7 +69,7 @@ const Leaderboard = () => {
                                     </CardContent>
                                 </Card>
 
-                                <Card className="bg-card/90 w-full m-4">
+                                <Card className="bg-card w-full m-4">
                                     <CardContent className="flex-row items-center justify-between pb-0 p-4">
                                         <View className="flex-row items-center flex-1">
                                             <View className="w-12 h-12 bg-secondary rounded-full items-center justify-center">
@@ -85,7 +84,7 @@ const Leaderboard = () => {
                                                 </Avatar>
                                             </View>
                                             <View className="flex-1">
-                                                <Text className="text-xl font-bold text-primary">Player Name</Text>
+                                                <Text className="text-2xl font-bold text-primary">Player Name</Text>
                                                 <Text className="text-primary/50 font-bold">Points: 590</Text>
                                             </View>
                                         </View>
@@ -108,7 +107,7 @@ const Leaderboard = () => {
                                                 </Avatar>
                                             </View>
                                             <View className="flex-1">
-                                                <Text className="text-xl font-bold text-primary">Player Name</Text>
+                                                <Text className="text-2xl font-bold text-primary">Player Name</Text>
                                                 <Text className="text-primary/50 font-bold">Points: 590</Text>
                                             </View>
                                         </View>
@@ -131,7 +130,7 @@ const Leaderboard = () => {
                                                 </Avatar>
                                             </View>
                                             <View className="flex-1">
-                                                <Text className="text-xl font-bold text-primary">Player Name</Text>
+                                                <Text className="text-2xl font-bold text-primary">Player Name</Text>
                                                 <Text className="text-primary/50 font-bold">Points: 590</Text>
                                             </View>
                                         </View>
@@ -154,7 +153,7 @@ const Leaderboard = () => {
                                                 </Avatar>
                                             </View>
                                             <View className="flex-1">
-                                                <Text className="text-xl font-bold text-primary">Player Name</Text>
+                                                <Text className="text-2xl font-bold text-primary">Player Name</Text>
                                                 <Text className="text-primary/50 font-bold">Points: 590</Text>
                                             </View>
                                         </View>
@@ -177,7 +176,7 @@ const Leaderboard = () => {
                                                 </Avatar>
                                             </View>
                                             <View className="flex-1">
-                                                <Text className="text-xl font-bold text-primary">Player Name</Text>
+                                                <Text className="text-2xl font-bold text-primary">Player Name</Text>
                                                 <Text className="text-primary/50 font-bold">Points: 590</Text>
                                             </View>
                                         </View>
