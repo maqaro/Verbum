@@ -43,13 +43,13 @@ const Lessons = () => {
                         </TabsTrigger>
                     </TabsList>
 
-                    <TabsContent value='yourQuizzes'>
+                    <TabsContent value='yourQuizzes' className="mb-24">
                         <View className="pt-4 rounded-50">
                             <Button className="bg-secondary">
                                 <CirclePlus className="color-primary p-4"/>
                             </Button>
                         </View>
-                        <ScrollView>
+                        <ScrollView showsVerticalScrollIndicator={false}>
                             <RefreshControl 
                                 onRefresh={onRefresh}
                                 refreshing={refreshing}    
@@ -74,8 +74,8 @@ const Lessons = () => {
                             </View>
                         </ScrollView>
                     </TabsContent>
-                    <TabsContent value='savedQuizzes'>
-                        <ScrollView >
+                    <TabsContent value='savedQuizzes' className="mb-24">
+                        <ScrollView showsVerticalScrollIndicator={false}>
                             <RefreshControl 
                                 onRefresh={onRefresh}
                                 refreshing={refreshing}    

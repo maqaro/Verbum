@@ -23,7 +23,10 @@ const Home = () => {
             <View id="profileHeader" className="bg-background flex-row items-center justify-center p-4">
                 <Text className="text-4xl font-semibold text-foreground">Welcome Back</Text>
             </View>
-            <ScrollView className="bg-background" >
+            <ScrollView 
+                className="bg-background"
+                showsVerticalScrollIndicator={false}
+            >
                 <RefreshControl
                     refreshing={refreshing}
                     onRefresh={onRefresh}

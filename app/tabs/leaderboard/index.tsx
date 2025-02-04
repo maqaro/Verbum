@@ -39,14 +39,17 @@ const Leaderboard = () => {
                             <Text>All Time</Text>
                         </TabsTrigger>
                     </TabsList>
-                    <TabsContent value="weekly">
-                        <ScrollView >
+                    <TabsContent value="weekly" className="w-full bg-background mb-24">
+                        <ScrollView 
+                            className="w-full bg-background"
+                            showsVerticalScrollIndicator={false}
+                        >
                             <RefreshControl
                                 onRefresh={onRefresh} 
                                 refreshing={refreshing}
                             />
                             <View className="flex-col w-full items-center">
-                                <Card className="bg-card/90 w-full m-4">
+                                <Card className="bg-card w-full m-4">
                                     <CardContent className="flex-row items-center justify-between pb-0 p-4">
                                         <View className="flex-row items-center flex-1">
                                             <View className="w-12 h-12 bg-secondary rounded-full items-center justify-center">
@@ -92,7 +95,7 @@ const Leaderboard = () => {
                                     </CardContent>
                                 </Card>
 
-                                <Card className="bg-card/90 w-full m-4">
+                                <Card className="bg-card w-full m-4">
                                     <CardContent className="flex-row items-center justify-between pb-0 p-4">
                                         <View className="flex-row items-center flex-1">
                                             <View className="w-12 h-12 bg-secondary rounded-full items-center justify-center">
@@ -115,7 +118,7 @@ const Leaderboard = () => {
                                     </CardContent>
                                 </Card>
 
-                                <Card className="bg-card/90 w-full m-4">
+                                <Card className="bg-card w-full m-4">
                                     <CardContent className="flex-row items-center justify-between pb-0 p-4">
                                         <View className="flex-row items-center flex-1">
                                             <View className="w-12 h-12 bg-secondary rounded-full items-center justify-center">
@@ -138,7 +141,7 @@ const Leaderboard = () => {
                                     </CardContent>
                                 </Card>
 
-                                <Card className="bg-card/90 w-full m-4">
+                                <Card className="bg-card w-full m-4">
                                     <CardContent className="flex-row items-center justify-between pb-0 p-4">
                                         <View className="flex-row items-center flex-1">
                                             <View className="w-12 h-12 bg-secondary rounded-full items-center justify-center">
@@ -161,7 +164,7 @@ const Leaderboard = () => {
                                     </CardContent>
                                 </Card>
 
-                                <Card className="bg-card/90 w-full m-4">
+                                <Card className="bg-card w-full m-4">
                                     <CardContent className="flex-row items-center justify-between pb-0 p-4">
                                         <View className="flex-row items-center flex-1">
                                             <View className="w-12 h-12 bg-secondary rounded-full items-center justify-center">
@@ -186,8 +189,109 @@ const Leaderboard = () => {
                             </View>
                         </ScrollView>
                     </TabsContent>
-                    <TabsContent value="alltime">
-                        <Text>All Time</Text>
+                    <TabsContent value="alltime" className="w-full bg-background mb-24">
+                        <ScrollView 
+                            className="w-full bg-background"
+                            showsVerticalScrollIndicator={false}
+                        >
+                            <RefreshControl
+                                onRefresh={onRefresh} 
+                                refreshing={refreshing}
+                            />
+                            <View className="flex-col w-full items-center">
+                                <Card className="bg-card w-full m-4">
+                                    <CardContent className="flex-row items-center justify-between pb-0 p-4">
+                                        <View className="flex-row items-center flex-1">
+                                            <View className="w-12 h-12 bg-secondary rounded-full items-center justify-center">
+                                                <Text className="text-primary text-2xl font-bold" id="rank">1</Text>
+                                            </View>
+                                            
+                                            <View className="mx-4">
+                                                <Avatar alt="avatar" className="w-24 h-24"> 
+                                                    <AvatarFallback>
+                                                        <Text className="text-4xl font-bold text-primary">PF</Text>
+                                                    </AvatarFallback>
+                                                </Avatar>
+                                            </View>
+                                            <View className="flex-1">
+                                                <Text className="text-2xl font-bold text-primary">Player Name</Text>
+                                                <Text className="text-primary/50 font-bold">Points: 590</Text>
+                                            </View>
+                                        </View>
+                                        <RankBadge rank={1} />
+                                    </CardContent>
+                                </Card>
+
+                                <Card className="bg-card w-full m-4">
+                                    <CardContent className="flex-row items-center justify-between pb-0 p-4">
+                                        <View className="flex-row items-center flex-1">
+                                            <View className="w-12 h-12 bg-secondary rounded-full items-center justify-center">
+                                                <Text className="text-primary text-2xl font-bold" id="rank">2</Text>
+                                            </View>
+                                            
+                                            <View className="mx-4">
+                                                <Avatar alt="avatar" className="w-24 h-24"> 
+                                                    <AvatarFallback>
+                                                        <Text className="text-4xl font-bold text-primary">PF</Text>
+                                                    </AvatarFallback>
+                                                </Avatar>
+                                            </View>
+                                            <View className="flex-1">
+                                                <Text className="text-2xl font-bold text-primary">Player Name</Text>
+                                                <Text className="text-primary/50 font-bold">Points: 590</Text>
+                                            </View>
+                                        </View>
+                                        <RankBadge rank={2} />
+                                    </CardContent>
+                                </Card>
+
+                                <Card className="bg-card w-full m-4">
+                                    <CardContent className="flex-row items-center justify-between pb-0 p-4">
+                                        <View className="flex-row items-center flex-1">
+                                            <View className="w-12 h-12 bg-secondary rounded-full items-center justify-center">
+                                                <Text className="text-primary text-2xl font-bold" id="rank">3</Text>
+                                            </View>
+                                            
+                                            <View className="mx-4">
+                                                <Avatar alt="avatar" className="w-24 h-24"> 
+                                                    <AvatarFallback>
+                                                        <Text className="text-4xl font-bold text-primary">PF</Text>
+                                                    </AvatarFallback>
+                                                </Avatar>
+                                            </View>
+                                            <View className="flex-1">
+                                                <Text className="text-2xl font-bold text-primary">Player Name</Text>
+                                                <Text className="text-primary/50 font-bold">Points: 590</Text>
+                                            </View>
+                                        </View>
+                                        <RankBadge rank={3} />
+                                    </CardContent>
+                                </Card>
+
+                                <Card className="bg-card w-full m-4">
+                                    <CardContent className="flex-row items-center justify-between pb-0 p-4">
+                                        <View className="flex-row items-center flex-1">
+                                            <View className="w-12 h-12 bg-secondary rounded-full items-center justify-center">
+                                                <Text className="text-primary text-2xl font-bold" id="rank">4</Text>
+                                            </View>
+                                            
+                                            <View className="mx-4">
+                                                <Avatar alt="avatar" className="w-24 h-24"> 
+                                                    <AvatarFallback>
+                                                        <Text className="text-4xl font-bold text-primary">PF</Text>
+                                                    </AvatarFallback>
+                                                </Avatar>
+                                            </View>
+                                            <View className="flex-1">
+                                                <Text className="text-2xl font-bold text-primary">Player Name</Text>
+                                                <Text className="text-primary/50 font-bold">Points: 590</Text>
+                                            </View>
+                                        </View>
+                                        <RankBadge rank={4}/>
+                                    </CardContent>
+                                </Card>
+                            </View>
+                        </ScrollView>
                     </TabsContent>
                 </Tabs>
 

@@ -25,8 +25,8 @@ const Profile = () => {
                     <UserPen className="color-primary"/>
                 </TouchableOpacity>
             </View>
-            <View className='bg-background flex-1 items-center p-6'>
-                <Card className="bg-background flex-1 items-center">
+            <View className='bg-background flex-1 items-center p-4'>
+                <Card className="bg-background flex-1 items-center m-4">
                     <Avatar alt="avatar" className="w-32 h-32 m-6">
                         <AvatarFallback>
                             <Text className="text-4xl font-bold text-foreground">PF</Text>
