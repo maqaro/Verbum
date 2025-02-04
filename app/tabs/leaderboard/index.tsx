@@ -45,7 +45,7 @@ const Leaderboard = () => {
                                 onRefresh={onRefresh} 
                                 refreshing={refreshing}
                             />
-                            <View className="flex-col w-full items-center mt-4">
+                            <View className="flex-col w-full items-center">
                                 <Card className="bg-card/90 w-full m-4">
                                     <CardContent className="flex-row items-center justify-between pb-0 p-4">
                                         <View className="flex-row items-center flex-1">
