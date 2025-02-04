@@ -1,10 +1,6 @@
 import React from "react";
 import { TouchableOpacity, View } from "react-native";
-import { Settings } from "~/lib/icons/Settings";
-import { UserPen } from "~/lib/icons/UserPen";
-import { Star } from "~/lib/icons/Star";
-import { Globe } from "~/lib/icons/Globe";
-import { LandPlot } from "~/lib/icons/LandPlot";
+import { Settings, UserPen, Star, Globe, LandPlot } from "~/lib/icons";
 import { Button } from "~/components/ui/button";
 import { Text } from "~/components/ui/text";
 import { Stack } from "expo-router";

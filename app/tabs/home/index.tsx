@@ -4,7 +4,7 @@ import Headerspace from "~/components/HeaderSpace";
 import { Stack } from "expo-router";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Progress } from "~/components/ui/progress";
-import Flame from "~/lib/icons/Flame";
+import { Flame } from "~/lib/icons";
 import { Button } from "~/components/ui/button";
 import { Avatar, AvatarFallback } from "~/components/ui/avatar";
 

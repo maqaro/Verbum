@@ -4,7 +4,7 @@ import Headerspace from "~/components/HeaderSpace";
 import { Text } from "~/components/ui/text";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { Button } from "~/components/ui/button";
-import CirclePlus from "~/lib/icons/CirclePlus";
+import { CirclePlus } from "~/lib/icons";
 import { Card, CardContent, CardHeader } from "~/components/ui/card";
 import { Avatar, AvatarFallback } from "~/components/ui/avatar";
 import { Progress } from "~/components/ui/progress";

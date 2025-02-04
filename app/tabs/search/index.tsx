@@ -6,7 +6,7 @@ import { Avatar, AvatarFallback } from '~/components/ui/avatar';
 import { Card, CardContent, CardFooter, CardTitle } from '~/components/ui/card';
 import { Input } from '~/components/ui/input';
 import { Text } from '~/components/ui/text';
-import { Search } from '~/lib/icons/Search'
+import { Search } from '~/lib/icons'
 
 const SearchPage = () => {
     const [searchQuery, setSearchQuery] = useState('');
