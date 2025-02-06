@@ -9,6 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Separator } from "~/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs'
 import Headerspace from '~/components/HeaderSpace'
+import { FIREBASE_AUTH } from "~/FirebaseConfig";
 
 const Profile = () => {
     const [tabValue, setTabValue] = React.useState('badges');
@@ -21,7 +22,7 @@ const Profile = () => {
                     <Settings className="color-primary"/>
                 </TouchableOpacity>
                 <Text className="text-4xl font-semibold text-foreground">Profile</Text>
-                <TouchableOpacity>
+                <TouchableOpacity onPress={() => FIREBASE_AUTH.signOut()}>
                     <UserPen className="color-primary"/>
                 </TouchableOpacity>
             </View>
