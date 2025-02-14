@@ -22,7 +22,7 @@ export default function authScreen() {
         setLoading(true);
         try {
             const response = await signInWithEmailAndPassword(auth, email, password);
-            // router.push('/tabs/home');
+            router.push('/tabs/home');
         } catch (error: any) {
             console.error(error);
         } finally {

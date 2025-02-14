@@ -3,7 +3,7 @@ import { TouchableOpacity, View } from "react-native";
 import { Settings, UserPen, Star, Globe, LandPlot } from "~/lib/icons";
 import { Button } from "~/components/ui/button";
 import { Text } from "~/components/ui/text";
-import { Stack } from "expo-router";
+import { router, Stack } from "expo-router";
 import { Card } from "~/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Separator } from "~/components/ui/separator";
@@ -18,7 +18,7 @@ const Profile = () => {
             <Stack.Screen options={{headerShown:false}} />
             <Headerspace/>
             <View id="profileHeader" className="bg-background flex-row items-center justify-between p-4">
-                <TouchableOpacity className="bg-secondary p-2 rounded-full">
+                <TouchableOpacity className="bg-secondary p-2 rounded-full" onPress={() => router.push('/tabs/profile/settings')}>
                     <Settings className="color-primary"/>
                 </TouchableOpacity>
                 <Text className="text-4xl font-semibold text-foreground">Profile</Text>

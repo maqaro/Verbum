@@ -7,7 +7,14 @@ export default function StackLayout() {
             name="index" 
             options={{ 
                 headerTitle: 'Profile',
-                headerShown: true
+                headerShown: false
+            }}
+        />
+        <Stack.Screen 
+            name="settings" 
+            options={{ 
+                headerTitle: 'Settings',
+                headerShown: false
             }}
         />
     </Stack>
