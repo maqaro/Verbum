@@ -3,44 +3,65 @@ import { View, TouchableOpacity, ScrollView, Alert } from "react-native"
 import { Text } from '~/components/ui/text'
 import { Input } from '~/components/ui/input'
 import { Button } from '~/components/ui/button'
-import { Avatar, AvatarFallback } from '~/components/ui/avatar'
+import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar'
 import { Card, CardContent, CardHeader } from "~/components/ui/card"
 import Headerspace from "~/components/HeaderSpace"
 import { Stack, useRouter } from "expo-router"
 import { Camera, ChevronLeft } from '~/lib/icons'
 import { FIREBASE_AUTH, FIREBASE_DB } from "~/FirebaseConfig"
 import { doc, DocumentSnapshot, getDoc, updateDoc } from "firebase/firestore"
+import * as ImagePicker from 'expo-image-picker'
 
 const Edit = () => {
     const router = useRouter()
     const user = FIREBASE_AUTH.currentUser
     
     const [loading, setLoading] = useState(false);
-    const [usernameField, setUsernameField] = useState('');
     const [userName, setUserName] = useState('');
+    const [avatar, setAvatar] = useState<string | undefined>(undefined);
 
     const updateUserName = async () => {
         setLoading(true);
         if (user?.email) {
             await updateDoc(doc(FIREBASE_DB, "userInfo", user.email), {
-                userName: usernameField
+                userName: userName
             })
-            setUserName(usernameField)
-            setUsernameField('')
-            setLoading(false)
+            setUserName(userName);
+            setUserName('');
+            setLoading(false);
         }
     }
 
-    const getUsername = async () => { 
+    const getUserInfo = async () => { 
         if (user?.email) {
             const userDoc = await getDoc(doc(FIREBASE_DB, "userInfo", user.email));
-            const data = userDoc.data()
+            const data = userDoc.data();
             setUserName(data?.userName || '');
+            setAvatar(data?.avatar || undefined);
+        }
+    }
+
+    const pickImage = async () => {
+        const result = await ImagePicker.launchImageLibraryAsync({
+            allowsEditing: true,
+            quality: 1,
+        })
+
+        if (!result.canceled){
+            setAvatar(result.assets[0].uri);
+        }
+    }
+
+    const updateAvatar = async () => {
+        if (user?.email && avatar){
+            await updateDoc(doc(FIREBASE_DB, "userInfo", user.email), {
+                avatar: avatar
+            })
         }
     }
 
     useEffect(() => {
-        getUsername();
+        getUserInfo();
     }, [])
 
     return (
@@ -63,20 +84,20 @@ const Edit = () => {
                         <View className="items-center">
                             <View>
                                 <Avatar alt="avatar" className="w-32 h-32">
+                                    <AvatarImage source={{uri: avatar}} />
                                     <AvatarFallback>
                                         <Text className="text-4xl font-bold">
                                             {userName.substring(0, 2)}
                                         </Text>
                                     </AvatarFallback>
                                 </Avatar>
-                                <TouchableOpacity className="absolute bottom-0 right-0 bg-primary p-2 rounded-full">
+                                <TouchableOpacity className="absolute bottom-0 right-0 bg-primary p-2 rounded-full" onPress={() => {pickImage()}}>
                                     <Camera size={24} className="text-secondary" />
                                 </TouchableOpacity>
                             </View>
                             <TouchableOpacity 
                                 onPress={() => {
-                                    // TODO: Implement image picker
-                                    Alert.alert('Coming soon', 'Image upload will be available soon')
+                                    pickImage()
                                 }}
                             >
                                 <Text className="text-primary mt-2 font-semibold">
@@ -89,8 +110,8 @@ const Edit = () => {
                         <View>
                             <Text className="text-foreground font-medium mb-2">Username</Text>
                             <Input 
-                                value={usernameField}
-                                onChangeText={setUsernameField}
+                                value={userName}
+                                onChangeText={setUserName}
                                 placeholder="Enter username"
                                 className="bg-background"
                             />
@@ -99,7 +120,10 @@ const Edit = () => {
 
                         <Button 
                             className="mt-4 bg-secondary"
-                            onPress={updateUserName}
+                            onPress={() => {
+                                updateAvatar();
+                                updateUserName();
+                            }}
                             disabled={loading}
                         >
                             <Text className="text-primary font-bold">

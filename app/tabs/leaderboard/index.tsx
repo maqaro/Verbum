@@ -1,5 +1,5 @@
 import { ScrollView, View , RefreshControl} from "react-native";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Stack } from "expo-router";
 import Headerspace from "~/components/HeaderSpace";
 import { Card, CardContent } from "~/components/ui/card";
@@ -16,12 +16,13 @@ interface Player {
     id: string;
     userName: string;
     points: number;
+    avatar: string | undefined;
 }
 
 const Leaderboard = () => {
-    const [tabValue, setTabValue] = React.useState('All');
-    const [leaderboardData, setLeaderboardData] = React.useState<Player[]>([]);
-    const [refreshing, setRefreshing] = React.useState(false);
+    const [tabValue, setTabValue] = useState('All');
+    const [leaderboardData, setLeaderboardData] = useState<Player[]>([]);
+    const [refreshing, setRefreshing] = useState(false);
     
     const fetchLeaderboardData = async () => {
         const querySnapshot = await getDocs(collection(FIREBASE_DB, "userInfo"));
@@ -29,11 +30,11 @@ const Leaderboard = () => {
             id:doc.id, 
             userName: doc.data().userName,
             points: doc.data().points,
+            avatar: doc.data().avatar,
         }));
 
         const sortedData =  data.sort((a, b) => b.points - a.points);
-        setLeaderboardData(data);
-        console.log(sortedData)
+        setLeaderboardData(sortedData);
     }
 
     const onRefresh = React.useCallback(() => {
@@ -84,6 +85,7 @@ const Leaderboard = () => {
                                         rank={index + 1}
                                         userName={player.userName}
                                         points={player.points}
+                                        avatar={player.avatar}
                                     />
                                 ))}
                                 

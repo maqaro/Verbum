@@ -1,19 +1,21 @@
 import { View } from "react-native";
 import { Card, CardContent } from "./ui/card";
 import { Text } from "./ui/text";
-import { Avatar, AvatarFallback } from "./ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import RankBadge from "./RankBadge";
 
 type LeaderboardEntryProps = {
     rank: number;
     userName: string;
     points: number;
+    avatar: string | undefined;
 }
 
 const LeaderboardEntry = ({
     rank,
     userName,
     points,
+    avatar,
 }: LeaderboardEntryProps) => (
     <Card className="bg-card w-full m-4">
         <CardContent className="flex-row items-center justify-between pb-0 p-4">
@@ -23,6 +25,7 @@ const LeaderboardEntry = ({
                 </View>
                 <View className="mx-4">
                     <Avatar alt="avatar" className="w-24 h-24"> 
+                        <AvatarImage source={{uri: avatar}} />
                         <AvatarFallback>
                             <Text className="text-4xl font-bold text-primary">{userName.slice(0, 2) }</Text>
                         </AvatarFallback>

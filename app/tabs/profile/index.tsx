@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { TouchableOpacity, View } from "react-native";
 import { Settings, UserPen, Star, Globe, LandPlot } from "~/lib/icons";
 import { Button } from "~/components/ui/button";
@@ -9,10 +9,33 @@ import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Separator } from "~/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs'
 import Headerspace from '~/components/HeaderSpace'
-import { FIREBASE_AUTH } from "~/FirebaseConfig";
+import { FIREBASE_AUTH, FIREBASE_DB } from "~/FirebaseConfig";
+import { doc, getDoc } from "firebase/firestore";
+import { useFocusEffect } from "@react-navigation/native";
 
 const Profile = () => {
-    const [tabValue, setTabValue] = React.useState('badges');
+    const user = FIREBASE_AUTH.currentUser
+    const [tabValue, setTabValue] = useState('badges');
+    const [points, setPoints] = useState(0);
+    const [userName, setUserName] = useState('');
+    const [avatar, setAvatar] = useState<string | undefined>(undefined);
+
+    const getUserInfo = async () => {
+        if (user?.email) {
+            const userDoc = await getDoc(doc(FIREBASE_DB, "userInfo", user.email));
+            const data = userDoc.data()
+            setPoints(data?.points || 0);
+            setAvatar(data?.avatar || undefined);
+            setUserName(data?.userName)
+        }
+    }
+
+    useFocusEffect(
+        React.useCallback(() => {
+            getUserInfo();
+        }, [])
+    );
+
     return (
         <>
             <Stack.Screen options={{headerShown:false}} />
@@ -29,8 +52,9 @@ const Profile = () => {
             <View className='bg-background flex-1 items-center p-4'>
                 <Card className="bg-background flex-1 items-center m-4">
                     <Avatar alt="avatar" className="w-32 h-32 m-6">
+                        <AvatarImage source={{uri: avatar}}/>
                         <AvatarFallback>
-                            <Text className="text-4xl font-bold text-foreground">PF</Text>
+                            <Text className="text-4xl font-bold text-foreground">{userName.substring(0,2)}</Text>
                         </AvatarFallback>
                     </Avatar>
                     <Card className='bg-card w-full m-4 p-4 items-center'>
@@ -38,7 +62,7 @@ const Profile = () => {
                             <View className='items-center'>
                                 <Star className='color-primary'/>
                                 <Text className='text-primary font-bold'>Points</Text>
-                                <Text className='text-xl font-bold'>590</Text>
+                                <Text className='text-xl font-bold'>{ points }</Text>
                             </View>
                             <Separator orientation='vertical'/>
                             <View className='items-center'>

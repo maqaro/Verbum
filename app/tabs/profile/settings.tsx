@@ -73,10 +73,6 @@ const Settings = () => {
                             description={FIREBASE_AUTH.currentUser?.email || "No email set"}
                         />
                         <Separator />
-                        <SettingItem
-                            title="Change Password"
-                            onPress={() => {/* Add password change logic */}}
-                        />
                         <Separator />
                         <SettingItem
                             title="Sign Out"
