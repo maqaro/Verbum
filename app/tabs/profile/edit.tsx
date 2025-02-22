@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { View, TouchableOpacity, ScrollView, Alert } from "react-native"
 import { Text } from '~/components/ui/text'
 import { Input } from '~/components/ui/input'
@@ -9,13 +9,39 @@ import Headerspace from "~/components/HeaderSpace"
 import { Stack, useRouter } from "expo-router"
 import { Camera, ChevronLeft } from '~/lib/icons'
 import { FIREBASE_AUTH, FIREBASE_DB } from "~/FirebaseConfig"
+import { doc, DocumentSnapshot, getDoc, updateDoc } from "firebase/firestore"
 
 const Edit = () => {
     const router = useRouter()
     const user = FIREBASE_AUTH.currentUser
     
-    const [loading, setLoading] = useState(false)
-    const [username, setUsername] = useState(user?.displayName || '')
+    const [loading, setLoading] = useState(false);
+    const [usernameField, setUsernameField] = useState('');
+    const [userName, setUserName] = useState('');
+
+    const updateUserName = async () => {
+        setLoading(true);
+        if (user?.email) {
+            await updateDoc(doc(FIREBASE_DB, "userInfo", user.email), {
+                userName: usernameField
+            })
+            setUserName(usernameField)
+            setUsernameField('')
+            setLoading(false)
+        }
+    }
+
+    const getUsername = async () => { 
+        if (user?.email) {
+            const userDoc = await getDoc(doc(FIREBASE_DB, "userInfo", user.email));
+            const data = userDoc.data()
+            setUserName(data?.userName || '');
+        }
+    }
+
+    useEffect(() => {
+        getUsername();
+    }, [])
 
     return (
         <>
@@ -39,7 +65,7 @@ const Edit = () => {
                                 <Avatar alt="avatar" className="w-32 h-32">
                                     <AvatarFallback>
                                         <Text className="text-4xl font-bold">
-                                            {username.substring(0, 2).toUpperCase()}
+                                            {userName.substring(0, 2)}
                                         </Text>
                                     </AvatarFallback>
                                 </Avatar>
@@ -63,8 +89,8 @@ const Edit = () => {
                         <View>
                             <Text className="text-foreground font-medium mb-2">Username</Text>
                             <Input 
-                                value={username}
-                                onChangeText={setUsername}
+                                value={usernameField}
+                                onChangeText={setUsernameField}
                                 placeholder="Enter username"
                                 className="bg-background"
                             />
@@ -73,7 +99,7 @@ const Edit = () => {
 
                         <Button 
                             className="mt-4 bg-secondary"
-                            // onPress={}
+                            onPress={updateUserName}
                             disabled={loading}
                         >
                             <Text className="text-primary font-bold">

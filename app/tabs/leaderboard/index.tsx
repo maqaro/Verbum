@@ -10,6 +10,7 @@ import RankBadge from "~/components/RankBadge";
 import { FIREBASE_DB } from "~/FirebaseConfig";
 import { getFirestore, collection, getDocs } from "firebase/firestore";
 import LeaderboardEntry from "~/components/LeaderboardEntry";
+import { useFocusEffect } from '@react-navigation/native';
 
 interface Player {
     id: string;
@@ -23,8 +24,7 @@ const Leaderboard = () => {
     const [refreshing, setRefreshing] = React.useState(false);
     
     const fetchLeaderboardData = async () => {
-        const db = FIREBASE_DB;
-        const querySnapshot = await getDocs(collection(db, "userInfo"));
+        const querySnapshot = await getDocs(collection(FIREBASE_DB, "userInfo"));
         const data = querySnapshot.docs.map(doc => ({
             id:doc.id, 
             userName: doc.data().userName,
@@ -41,9 +41,11 @@ const Leaderboard = () => {
         fetchLeaderboardData().then(() => setRefreshing(false)); 
     }, []);
 
-    useEffect(() => {
-        fetchLeaderboardData();
-    }, []);
+    useFocusEffect(
+        React.useCallback(() => {
+            fetchLeaderboardData();
+        }, [])
+    );
 
     return (
         <>

@@ -7,9 +7,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { router, Stack } from "expo-router";
-import { FIREBASE_AUTH } from "~/FirebaseConfig";
+import { FIREBASE_AUTH, FIREBASE_DB } from "~/FirebaseConfig";
 import { ActivityIndicator } from "react-native";
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
+import { doc, setDoc } from "firebase/firestore";
 
 export default function authScreen() {
     const [tabValue, setTabValue] = React.useState('login');
@@ -34,12 +35,25 @@ export default function authScreen() {
         setLoading(true);
         try {
             const response = await createUserWithEmailAndPassword(auth, email, password);
+            if (response.user) {
+                createUserDetails()
+            }
         } catch (error: any) {
             console.error(error);
             alert('Sign In' + error.message);
         } finally {
             setLoading(false);
         }
+    }
+
+    const createUserDetails = () => {
+        const DEFAULT_USERNAME = "NewUser"
+
+        setDoc(doc(FIREBASE_DB, "userInfo", email), {
+            missionsCompleted: 0,
+            points: 0,
+            userName: DEFAULT_USERNAME
+        })
     }
 
     return (

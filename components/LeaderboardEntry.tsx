@@ -24,7 +24,7 @@ const LeaderboardEntry = ({
                 <View className="mx-4">
                     <Avatar alt="avatar" className="w-24 h-24"> 
                         <AvatarFallback>
-                            <Text className="text-4xl font-bold text-primary">{userName.slice(0, 1) }</Text>
+                            <Text className="text-4xl font-bold text-primary">{userName.slice(0, 2) }</Text>
                         </AvatarFallback>
                     </Avatar>
                 </View>
