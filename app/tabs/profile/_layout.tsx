@@ -17,6 +17,13 @@ export default function StackLayout() {
                 headerShown: false
             }}
         />
+         <Stack.Screen 
+            name="edit" 
+            options={{ 
+                headerTitle: 'Edit',
+                headerShown: false
+            }}
+        />
     </Stack>
     )
 }

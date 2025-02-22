@@ -1,3 +1,4 @@
+export * from './Camera'
 export * from './Check';
 export * from './ChevronDown';
 export * from './ChevronLeft';

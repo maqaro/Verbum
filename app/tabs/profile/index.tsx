@@ -22,7 +22,7 @@ const Profile = () => {
                     <Settings className="color-primary"/>
                 </TouchableOpacity>
                 <Text className="text-4xl font-semibold text-foreground">Profile</Text>
-                <TouchableOpacity onPress={() => FIREBASE_AUTH.signOut()}>
+                <TouchableOpacity className='bg-secondary p-2 rounded-full' onPress={() =>router.push('/tabs/profile/edit')}>
                     <UserPen className="color-primary"/>
                 </TouchableOpacity>
             </View>
