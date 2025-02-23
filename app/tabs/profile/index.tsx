@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { TouchableOpacity, View } from "react-native";
 import { Settings, UserPen, Star, Globe, LandPlot } from "~/lib/icons";
-import { Button } from "~/components/ui/button";
 import { Text } from "~/components/ui/text";
 import { router, Stack } from "expo-router";
 import { Card } from "~/components/ui/card";

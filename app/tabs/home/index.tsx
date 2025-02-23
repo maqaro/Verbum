@@ -1,21 +1,99 @@
 import { View, Text, ScrollView, RefreshControl, TouchableOpacity } from "react-native";
-import React from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import Headerspace from "~/components/HeaderSpace";
 import { Stack } from "expo-router";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Progress } from "~/components/ui/progress";
 import { Flame } from "~/lib/icons";
-import { Button } from "~/components/ui/button";
 import { Avatar, AvatarFallback } from "~/components/ui/avatar";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { FIREBASE_AUTH, FIREBASE_DB } from "~/FirebaseConfig";
 
 const Home = () => {
-    const [refreshing, setRefreshing] = React.useState(false);
+    const user = FIREBASE_AUTH.currentUser
+    const [refreshing, setRefreshing] = useState(false);
+    const [currentStreak, setCurrentStreak] = useState<number>(0);
+    const [highestStreak, setHighestStreak] = useState<number>(0);
+    const [lastLoggedIn, setLastLoggedIn] = useState<Date | null>(null);
+    const progressValue = highestStreak > 0 ? (currentStreak / highestStreak) * 100 : 0;
 
-    const onRefresh = React.useCallback(() => {
+    const fetchUserData = async () => {
+        if (user?.email){
+            const userDoc = await getDoc(doc(FIREBASE_DB, "userInfo", user?.email)); 
+            if (userDoc.exists()) {
+                const data = userDoc.data();
+                setCurrentStreak(data?.currentStreak || 0);
+                setHighestStreak(data?.highestStreak || 0);
+                setLastLoggedIn(data?.lastLoggedIn ? new Date(data?.lastLoggedIn) : null);
+            }
+        }
+    }
+
+    const updateStreak = async () => {
+        if (!user?.email) return;
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const userDoc = await getDoc(doc(FIREBASE_DB, "userInfo", user.email));
+        if (!userDoc.exists()) return;
+
+        const data = userDoc.data();
+        const lastLogin = data.lastLoggedIn ? new Date(data.lastLoggedIn) : null;
+        let newStreak = data.currentStreak || 0;
+
+        if (lastLogin) {
+            lastLogin.setHours(0, 0, 0, 0);
+            
+            // If last login was today, don't update anything
+            if (lastLogin.getTime() === today.getTime()) {
+                console.log('log in today')
+                return;
+            }
+            
+            // If last login was yesterday, increment streak
+            const yesterday = new Date(today);
+            yesterday.setDate(yesterday.getDate() - 1);
+            if (lastLogin.getTime() === yesterday.getTime()) {
+                newStreak += 1;
+                console.log('log in yesterday, increment')
+            } else {
+                // If last login was more than a day ago, reset streak
+                console.log('reset log in')
+                newStreak = 1;
+            }
+        } else {
+            console.log('first time')
+            newStreak = 1;
+        }
+
+        await updateDoc(doc(FIREBASE_DB, "userInfo", user.email), {
+            currentStreak: newStreak,
+            lastLoggedIn: today.toISOString(),
+            highestStreak: Math.max(newStreak, data.highestStreak || 0)
+        });
+
+        // Update local state
+        setCurrentStreak(newStreak);
+        setHighestStreak(Math.max(newStreak, data.highestStreak || 0));
+        setLastLoggedIn(today);
+    };
+
+    const onRefresh = useCallback(() => {
         setRefreshing(true);
-        
+        fetchUserData();
+        updateStreak();
         setTimeout(() => setRefreshing(false), 500);
     }, []);
+
+    useEffect(() => {
+        const initializeData = async () => {
+            await fetchUserData();
+            await updateStreak();
+        };
+        initializeData();
+    }, []);
+
     return (
         <>
             <Stack.Screen options={{headerShown:false}} />
@@ -42,10 +120,10 @@ const Home = () => {
                             </CardHeader>
                             <CardContent >
                                 <View className="flex-row justify-between items-end pb-1">
-                                    <Text className="text-primary text-2xl font-bold">7 Days</Text>
-                                    <Text className="text-primary text-xl font-semibold">Best: 9 days</Text>
+                                    <Text className="text-primary text-2xl font-bold">{currentStreak} Days</Text>
+                                    <Text className="text-primary text-xl font-semibold">Best: {highestStreak} days</Text>
                                 </View>
-                                <Progress value={77} className="h-6" />
+                                <Progress value={progressValue} className="h-6" />
                                 <Text className="font-2xl text-primary/60 pt-2 font-semibold">Complete today's lesson to keep your streak!</Text>
                             </CardContent>
                         </Card>
