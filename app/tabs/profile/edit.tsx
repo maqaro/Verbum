@@ -24,7 +24,10 @@ const Edit = () => {
         setLoading(true);
         if (user?.email) {
             await updateDoc(doc(FIREBASE_DB, "userInfo", user.email), {
-                userName: userName
+                details: {
+                    userName: userName,
+                    userNameLower: userName.toLowerCase()
+                }
             })
             setUserName(userName);
             setLoading(false);
@@ -35,7 +38,7 @@ const Edit = () => {
         if (user?.email) {
             const userDoc = await getDoc(doc(FIREBASE_DB, "userInfo", user.email));
             const data = userDoc.data();
-            setUserName(data?.userName || '');
+            setUserName(data?.details.userName || '');
             setAvatar(data?.avatar.uri || undefined);
         }
     }
@@ -56,7 +59,7 @@ const Edit = () => {
             await updateDoc(doc(FIREBASE_DB, "userInfo", user.email), {
                 avatar: {
                     uri: avatar
-                }
+                },
             })
         }
     }

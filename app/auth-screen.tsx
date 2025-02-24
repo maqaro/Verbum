@@ -52,7 +52,11 @@ export default function authScreen() {
         setDoc(doc(FIREBASE_DB, "userInfo", email), {
             missionsCompleted: 0,
             points: 0,
-            userName: DEFAULT_USERNAME,
+            details: {
+                email: email,
+                userName: DEFAULT_USERNAME,
+                userNameLower: DEFAULT_USERNAME.toLowerCase()
+            },
             avatar: {
                 uri: null
             },

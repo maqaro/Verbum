@@ -27,7 +27,7 @@ const Leaderboard = () => {
         const querySnapshot = await getDocs(collection(FIREBASE_DB, "userInfo"));
         const data = querySnapshot.docs.map(doc => ({
             id:doc.id, 
-            userName: doc.data().userName,
+            userName: doc.data().details.userName,
             points: doc.data().points,
             avatar: doc.data().avatar.uri,
         }));

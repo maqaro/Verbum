@@ -25,7 +25,7 @@ const Profile = () => {
             const data = userDoc.data()
             setPoints(data?.points || 0);
             setAvatar(data?.avatar.uri || undefined);
-            setUserName(data?.userName)
+            setUserName(data?.details.userName)
         }
     }
 
