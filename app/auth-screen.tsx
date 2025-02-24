@@ -53,8 +53,15 @@ export default function authScreen() {
             missionsCompleted: 0,
             points: 0,
             userName: DEFAULT_USERNAME,
-            avatar: undefined,
-            friends: []
+            avatar: {
+                uri: null
+            },
+            friends: [],
+            streakInfo: { 
+                currentStreak: 0,
+                highestStreak: 0,
+                lastLoggedIn: new Date().toISOString(),
+            },
         })
     }
 

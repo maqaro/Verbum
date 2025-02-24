@@ -12,19 +12,27 @@ import { FIREBASE_AUTH, FIREBASE_DB } from "~/FirebaseConfig";
 const Home = () => {
     const user = FIREBASE_AUTH.currentUser
     const [refreshing, setRefreshing] = useState(false);
-    const [currentStreak, setCurrentStreak] = useState<number>(0);
-    const [highestStreak, setHighestStreak] = useState<number>(0);
-    const [lastLoggedIn, setLastLoggedIn] = useState<Date | null>(null);
-    const progressValue = highestStreak > 0 ? (currentStreak / highestStreak) * 100 : 0;
+    const [streakInfo, setStreakInfo] = useState<{
+        currentStreak: number;
+        highestStreak: number;
+        lastLoggedIn: Date | null;
+    }>({
+        currentStreak: 0,
+        highestStreak: 0,
+        lastLoggedIn: null,
+    });
+    const progressValue = streakInfo.highestStreak > 0 ? (streakInfo.currentStreak / streakInfo.highestStreak) * 100 : 0;
 
     const fetchUserData = async () => {
         if (user?.email){
             const userDoc = await getDoc(doc(FIREBASE_DB, "userInfo", user?.email)); 
             if (userDoc.exists()) {
                 const data = userDoc.data();
-                setCurrentStreak(data?.currentStreak || 0);
-                setHighestStreak(data?.highestStreak || 0);
-                setLastLoggedIn(data?.lastLoggedIn ? new Date(data?.lastLoggedIn) : null);
+                setStreakInfo(data?.streakInfo || {
+                    currentStreak: 0,
+                    highestStreak: 0,
+                    lastLoggedIn: null,
+                });
             }
         }
     }
@@ -39,44 +47,40 @@ const Home = () => {
         if (!userDoc.exists()) return;
 
         const data = userDoc.data();
-        const lastLogin = data.lastLoggedIn ? new Date(data.lastLoggedIn) : null;
-        let newStreak = data.currentStreak || 0;
+        const lastLogin = data.streakInfo.lastLoggedIn ? new Date(data.streakInfo.lastLoggedIn) : null;
+        let newStreak = data.streakInfo.currentStreak || 0;
 
         if (lastLogin) {
             lastLogin.setHours(0, 0, 0, 0);
             
-            // If last login was today, don't update anything
             if (lastLogin.getTime() === today.getTime()) {
-                console.log('log in today')
                 return;
             }
             
-            // If last login was yesterday, increment streak
             const yesterday = new Date(today);
             yesterday.setDate(yesterday.getDate() - 1);
             if (lastLogin.getTime() === yesterday.getTime()) {
                 newStreak += 1;
-                console.log('log in yesterday, increment')
             } else {
-                // If last login was more than a day ago, reset streak
-                console.log('reset log in')
                 newStreak = 1;
             }
         } else {
-            console.log('first time')
             newStreak = 1;
         }
 
         await updateDoc(doc(FIREBASE_DB, "userInfo", user.email), {
-            currentStreak: newStreak,
-            lastLoggedIn: today.toISOString(),
-            highestStreak: Math.max(newStreak, data.highestStreak || 0)
+            streakInfo: {
+                currentStreak: newStreak,
+                lastLoggedIn: today.toISOString(),
+                highestStreak: Math.max(newStreak, data.streakInfo.highestStreak || 0)
+            },
         });
 
-        // Update local state
-        setCurrentStreak(newStreak);
-        setHighestStreak(Math.max(newStreak, data.highestStreak || 0));
-        setLastLoggedIn(today);
+        setStreakInfo((prev) => ({
+            currentStreak: newStreak,
+            highestStreak: Math.max(newStreak, prev.highestStreak),
+            lastLoggedIn: today,
+        }));
     };
 
     const onRefresh = useCallback(() => {
@@ -120,8 +124,8 @@ const Home = () => {
                             </CardHeader>
                             <CardContent >
                                 <View className="flex-row justify-between items-end pb-1">
-                                    <Text className="text-primary text-2xl font-bold">{currentStreak} Days</Text>
-                                    <Text className="text-primary text-xl font-semibold">Best: {highestStreak} days</Text>
+                                    <Text className="text-primary text-2xl font-bold">{streakInfo.currentStreak} Days</Text>
+                                    <Text className="text-primary text-xl font-semibold">Best: {streakInfo.highestStreak} days</Text>
                                 </View>
                                 <Progress value={progressValue} className="h-6" />
                                 <Text className="font-2xl text-primary/60 pt-2 font-semibold">Complete today's lesson to keep your streak!</Text>

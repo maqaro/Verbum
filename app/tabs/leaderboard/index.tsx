@@ -29,7 +29,7 @@ const Leaderboard = () => {
             id:doc.id, 
             userName: doc.data().userName,
             points: doc.data().points,
-            avatar: doc.data().avatar,
+            avatar: doc.data().avatar.uri,
         }));
 
         const sortedData =  data.sort((a, b) => b.points - a.points);

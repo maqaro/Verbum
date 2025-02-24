@@ -24,7 +24,7 @@ const Profile = () => {
             const userDoc = await getDoc(doc(FIREBASE_DB, "userInfo", user.email));
             const data = userDoc.data()
             setPoints(data?.points || 0);
-            setAvatar(data?.avatar || undefined);
+            setAvatar(data?.avatar.uri || undefined);
             setUserName(data?.userName)
         }
     }

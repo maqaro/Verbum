@@ -27,7 +27,6 @@ const Edit = () => {
                 userName: userName
             })
             setUserName(userName);
-            setUserName('');
             setLoading(false);
         }
     }
@@ -37,7 +36,7 @@ const Edit = () => {
             const userDoc = await getDoc(doc(FIREBASE_DB, "userInfo", user.email));
             const data = userDoc.data();
             setUserName(data?.userName || '');
-            setAvatar(data?.avatar || undefined);
+            setAvatar(data?.avatar.uri || undefined);
         }
     }
 
@@ -55,7 +54,9 @@ const Edit = () => {
     const updateAvatar = async () => {
         if (user?.email && avatar){
             await updateDoc(doc(FIREBASE_DB, "userInfo", user.email), {
-                avatar: avatar
+                avatar: {
+                    uri: avatar
+                }
             })
         }
     }
