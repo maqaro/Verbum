@@ -5,7 +5,7 @@ import { Card, CardContent, CardFooter, CardTitle } from "./ui/card";
 
 interface SearchResultCardProps {
     id: string;
-    type: 'profile' | 'quiz';
+    type: string;
     title: string;
     subtitle: string;
     avatar?: string;
@@ -21,10 +21,10 @@ const SearchResultCard = ({
     onPress
 }: SearchResultCardProps) => {
     return (
-        <TouchableOpacity onPress={onPress}>
+        <TouchableOpacity onPress={onPress} className="w-full active:opacity-0">
             <Card 
                 key={id}
-                className='bg-card/50 hover:bg-card/80 flex-row items-center p-4 space-x-4 mb-4'
+                className='bg-card/50 flex-row items-center p-4 space-x-4 mb-4'
             >
                 <View className='flex-1 space-y-2'>
                     <CardTitle>
@@ -37,7 +37,7 @@ const SearchResultCard = ({
                     </CardContent>
                     <CardFooter className='p-0'>
                         <Text className='text-primary'>
-                            View {type === 'profile' ? 'Profile' : 'Quiz'} → 
+                            {type}
                         </Text>
                     </CardFooter>
                 </View>
