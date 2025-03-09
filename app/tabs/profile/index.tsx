@@ -9,7 +9,7 @@ import { Separator } from "~/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs'
 import Headerspace from '~/components/HeaderSpace'
 import { FIREBASE_AUTH, FIREBASE_DB } from "~/FirebaseConfig";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, collection, getDocs } from "firebase/firestore";
 import { useFocusEffect } from "@react-navigation/native";
 
 const Profile = () => {
@@ -18,6 +18,7 @@ const Profile = () => {
     const [points, setPoints] = useState(0);
     const [userName, setUserName] = useState('');
     const [avatar, setAvatar] = useState<string | undefined>(undefined);
+    const [userRank, setUserRank] = useState<number | null>(null);
 
     const getUserInfo = async () => {
         if (user?.email) {
@@ -29,11 +30,43 @@ const Profile = () => {
         }
     }
 
+    const getUserRank = async () => {
+        const sortedUsers = await fetchAndSortUsers();
+        
+        const userRank = sortedUsers.findIndex(u => u.id === user?.email) + 1;
+        
+        return userRank > 0 ? userRank : null;
+    };
+
     useFocusEffect(
         React.useCallback(() => {
-            getUserInfo();
+            getUserInfo().then(() => {
+                getUserRank().then(rank => {
+                    setUserRank(rank);
+                });
+            });
         }, [])
     );
+
+    const fetchAndSortUsers = async () => {
+        try {
+            const querySnapshot = await getDocs(collection(FIREBASE_DB, "userInfo"));
+
+            const users = querySnapshot.docs.map(doc => ({
+                id: doc.id,
+                userName: doc.data().details.userName,
+                points: doc.data().points,
+                avatar: doc.data().avatar.uri,
+            }));
+
+            const sortedUsers = users.sort((a, b) => b.points - a.points);
+
+            return sortedUsers; 
+        } catch (error) {
+            console.error("Error fetching users: ", error);
+            return [];
+        }
+    };
 
     return (
         <>
@@ -56,24 +89,18 @@ const Profile = () => {
                             <Text className="text-4xl font-bold text-foreground">{userName.substring(0,2)}</Text>
                         </AvatarFallback>
                     </Avatar>
-                    <Card className='bg-card w-full m-4 p-4 items-center'>
-                        <View className='flex-row justify-around w-full'>
-                            <View className='items-center'>
+                    <Card className='bg-card w-full m-4 p-6 items-center'>
+                        <View className='flex-row justify-center'>
+                            <View className='flex-1 items-center'>
                                 <Star className='color-primary'/>
                                 <Text className='text-primary font-bold'>Points</Text>
                                 <Text className='text-xl font-bold'>{ points }</Text>
                             </View>
                             <Separator orientation='vertical'/>
-                            <View className='items-center'>
+                            <View className='flex-1 items-center'>
                                 <Globe className='color-primary'/>
-                                <Text className='text-primary font-bold'>World Rank</Text>
-                                <Text className='text-xl font-bold'>#1,438</Text>
-                            </View>
-                            <Separator orientation='vertical'/>
-                            <View className='items-center'>
-                                <LandPlot className='color-primary'/>
-                                <Text className='text-primary font-bold'>Local Rank</Text>
-                                <Text className='text-xl font-bold'>#56</Text>
+                                <Text className='text-primary font-bold'>Rank</Text>
+                                <Text className='text-xl font-bold'>{userRank !== null ? `#${userRank}` : 'N/A'}</Text>
                             </View>
                         </View>
                     </Card>

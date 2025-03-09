@@ -191,7 +191,7 @@ const Home = () => {
                                         </CardTitle>
                                     </CardHeader>
                                     <CardContent>
-                                        <Progress value={33} />
+                                        <Progress value={33} indicatorClassName=""/>
                                         <Text className="font-2xl text-primary/60 pt-2 font-semibold">1/3 Completed</Text>
                                     </CardContent>
                                 </Card>

@@ -50,7 +50,6 @@ export default function authScreen() {
         const DEFAULT_USERNAME = "NewUser"
 
         setDoc(doc(FIREBASE_DB, "userInfo", email), {
-            missionsCompleted: 0,
             points: 0,
             details: {
                 email: email,
@@ -66,6 +65,9 @@ export default function authScreen() {
                 highestStreak: 0,
                 lastLoggedIn: new Date().toISOString(),
             },
+            missions: {
+                missionsCompleted: 0,
+            }
         })
     }
 
