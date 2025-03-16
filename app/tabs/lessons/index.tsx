@@ -1,26 +1,62 @@
-import { Stack } from "expo-router";
+import { Stack, useFocusEffect } from "expo-router";
 import { View } from "react-native";
 import Headerspace from "~/components/HeaderSpace";
 import { Text } from "~/components/ui/text";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { Button } from "~/components/ui/button";
 import { CirclePlus } from "~/lib/icons";
-import { Card, CardContent, CardHeader } from "~/components/ui/card";
-import { Avatar, AvatarFallback } from "~/components/ui/avatar";
-import { Progress } from "~/components/ui/progress";
 import { RefreshControl, ScrollView } from "react-native";
-import React from "react";
+import React, { useCallback, useState } from "react";
+import QuizCard from "~/components/QuizCard";
+import { FIREBASE_AUTH, FIREBASE_DB } from "~/FirebaseConfig";
+import { doc, getDoc } from "firebase/firestore";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+  } from '~/components/ui/alert-dialog';
+import AddQuizAlert from "~/components/AddQuizAlert";
+
+interface QuizListEntry{
+    id: string;
+    name: string;
+    languageCode: string;
+}
 
 const Lessons = () => {
-    const [tabValue, setTabValue] = React.useState('yourQuizzes');
-
-    const [refreshing, setRefreshing] = React.useState(false);
+    const user = FIREBASE_AUTH.currentUser;
+    const [tabValue, setTabValue] = useState('yourQuizzes');
+    const [userQuizzesList, setUserQuizzesList] = useState<QuizListEntry[]>([]);
+    const [savedQuizzesList, SetSavedQuizzesList] = useState<QuizListEntry[]>([]);
+    const [refreshing, setRefreshing] = useState<boolean>(false);
+    const [isPopup, setIsPopup] = useState<boolean>(false);
         
-    const onRefresh = React.useCallback(() => {
+    const getQuizzes = async () => {
+        if (user?.email){
+            const userDoc = await getDoc(doc(FIREBASE_DB, "userInfo", user.email));
+            const data = userDoc.data();
+            setUserQuizzesList(data?.quizzes.userQuizzes || []);
+            SetSavedQuizzesList(data?.quizzes.savedQuizzes || []);
+        }
+    }
+
+    const onRefresh = useCallback(() => {
         setRefreshing(true);
-            
+        getQuizzes();
         setTimeout(() => setRefreshing(false), 500);
     }, []);
+
+    useFocusEffect(
+        useCallback(() => {
+            getQuizzes();
+        }, [])
+    );
 
     return (
         <>
@@ -44,33 +80,30 @@ const Lessons = () => {
                     </TabsList>
 
                     <TabsContent value='yourQuizzes' className="mb-24">
-                        <View className="pt-4 rounded-50">
-                            <Button className="bg-secondary">
-                                <CirclePlus className="color-primary p-4"/>
-                            </Button>
-                        </View>
-                        <ScrollView showsVerticalScrollIndicator={false}>
+                        <AddQuizAlert/>
+
+                        <ScrollView showsVerticalScrollIndicator={false} className="h-full">
                             <RefreshControl 
                                 onRefresh={onRefresh}
                                 refreshing={refreshing}    
                             />
                             <View className="flex-col w-full items-center mt-4">
-                                <Card className="bg-card w-full mb-4">
-                                    <CardContent className="flex-row pb-2 items-center">
-                                        <View className="flex-1">
-                                            <Text className="text-2xl text-primary font-bold">Quiz Name</Text>
-                                            <Text className="text-primary/50 mb-4">Tap to Expand</Text>
-                                            <Progress className="h-6" value={50} max={100}/>
-                                        </View>
-                                        <View className="p-4 pr-0 items-center">
-                                            <Avatar alt="Avatar" className="w-24 h-24">
-                                                <AvatarFallback>
-                                                    <Text>JD</Text>
-                                                </AvatarFallback>
-                                            </Avatar>
-                                        </View>
-                                    </CardContent>
-                                </Card>
+                                {userQuizzesList && userQuizzesList.length > 0 ? (
+                                    userQuizzesList.map((item, index) => (
+                                        <QuizCard 
+                                            key={index}
+                                            name={item.name}
+                                            progress={10}
+                                            quizId={item.id}
+                                            languageCode={item.languageCode}
+                                        />
+                                    ))
+                                ) : (
+                                    <View className="py-8 items-center">
+                                        <Text className="text-lg text-muted-foreground">No quizzes found</Text>
+                                        <Text className="text-sm text-muted-foreground mt-2">Create a new quiz to get started</Text>
+                                    </View>
+                                )}                      
                             </View>
                         </ScrollView>
                     </TabsContent>
@@ -81,24 +114,22 @@ const Lessons = () => {
                                 refreshing={refreshing}    
                             />
                             <View className="flex-col w-full items-center mt-6">
-
-                                <Card className="bg-card w-full mb-4">
-                                    <CardContent className="flex-row pb-2 items-center">
-                                        <View className="flex-1">
-                                            <Text className="text-2xl text-primary font-bold">Quiz Name</Text>
-                                            <Text className="text-primary/50 mb-4">Tap to Expand</Text>
-                                            <Progress className="h-6" value={50} max={100}/>
-                                        </View>
-                                        <View className="p-4 pr-0 items-center">
-                                            <Avatar alt="Avatar" className="w-24 h-24">
-                                                <AvatarFallback>
-                                                    <Text>JD</Text>
-                                                </AvatarFallback>
-                                            </Avatar>
-                                        </View>
-                                    </CardContent>
-                                </Card>
-
+                                { savedQuizzesList.length > 0 ? (
+                                    savedQuizzesList.map((item, index) => (
+                                        <QuizCard 
+                                            key={index}
+                                            name={item.name}
+                                            progress={10}
+                                            quizId={item.id}
+                                            languageCode={item.languageCode}
+                                        />
+                                    ))
+                                ) : (
+                                    <View className="py-8 items-center">
+                                        <Text className="text-lg text-muted-foreground">No quizzes found</Text>
+                                        <Text className="text-sm text-muted-foreground mt-2">Save a new quiz to get started</Text>
+                                    </View>
+                                )}
                             </View>
                         </ScrollView>
                     </TabsContent>

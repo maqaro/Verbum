@@ -6,8 +6,10 @@ import { Input } from '~/components/ui/input';
 import { Text } from '~/components/ui/text';
 import { Search } from '~/lib/icons'
 import { FIREBASE_DB, FIREBASE_AUTH } from '~/FirebaseConfig';
-import { collection, getDocs, query, where, or, getDoc, doc, updateDoc } from 'firebase/firestore';
+import { collection, getDocs, query, where, or, getDoc, doc, updateDoc, setDoc, arrayUnion } from 'firebase/firestore';
 import SearchResultCard from '~/components/SearchCardResults';
+import { Languages } from 'lucide-react-native';
+import FlagAvatar from '~/components/FlagAvatar';
 
 interface SearchResult {
     id: string;
@@ -15,11 +17,25 @@ interface SearchResult {
     title: string;
     subtitle: string;
     avatar?: string;
+    languageCode?: string;
+}
+
+interface Quiz {
+    id: string;
+    name: string;
+    originalId?: string;
+    languageCode: string;
+}
+
+interface UserData {
+    quizzes?: {
+        savedQuizzes?: Quiz[]; 
+        userQuizzes?: string[];
+    };
 }
 
 const SearchPage = () => {
     const user = FIREBASE_AUTH.currentUser;
-
     const [searchQuery, setSearchQuery] = useState('');
     const [refreshing, setRefreshing] = useState(false);
     const [results, setResults] = useState<SearchResult[]>([]);
@@ -41,6 +57,13 @@ const SearchPage = () => {
                 where('details.userNameLower', '<=', usersQuery + '\uf8ff'))
             );
 
+            const quizzesSnapshot = await getDocs(
+                query(collection(FIREBASE_DB, "quizzes"),
+                where('info.isOriginal', '==', true),
+                where('info.nameLower', '>=', usersQuery),
+                where('info.nameLower', '<=', usersQuery + '\uf8ff'))
+            );
+
             const userResults: SearchResult[] = usersSnapshot.docs.map(doc => ({
                 id: doc.id,
                 type: "Add Friend",
@@ -49,17 +72,14 @@ const SearchPage = () => {
                 avatar: doc.data().avatar?.uri
             }));
 
-            setResults([...userResults]);
-
-            // TODO: Implement quiz search when quiz collection is available
-            const quizResults: SearchResult[] = [
-                // {
-                //     id: 'quiz1',
-                //     type: 'quiz',
-                //     title: 'Basic Vocabulary',
-                //     subtitle: 'By Maqaro',
-                // }
-            ];
+            const quizResults: SearchResult[] = quizzesSnapshot.docs.map(doc => ({
+                id: doc.id,
+                type: "Save Quiz",
+                title: doc.data().info.name || '',
+                subtitle: `Owner: ${doc.data().info.owner}`,
+                avatar: "",
+                languageCode: doc.data().info.languageCode,
+            }));
 
             setResults([...userResults, ...quizResults]);
         } catch (error) {
@@ -96,7 +116,14 @@ const SearchPage = () => {
                         : result
                 ));
                 return;
-            } else if (!friendsList.includes(cardEmail)){
+            } else if (user.email == cardEmail){
+                setResults(results.map(result => 
+                    result.id === cardEmail 
+                        ? { ...result, type: 'You can not friend yourself!' }
+                        : result
+                ));
+                return;
+            }else if (!friendsList.includes(cardEmail)){
                 setResults(results.map(result => 
                     result.id === cardEmail 
                         ? { ...result, type: 'Friend added!' }
@@ -109,10 +136,97 @@ const SearchPage = () => {
         }
     }
 
-    const copyQuiz = () => {
-        //TODO
-        console.log("TODO: copied quiz")
-    }
+    const copyQuiz = async (): Promise<void> => {
+        if (!user?.email) return;
+    
+        const userDocRef = doc(FIREBASE_DB, "userInfo", user.email);
+        const userDoc = await getDoc(userDocRef);
+    
+        if (!userDoc.exists()) return;
+    
+        const userData = userDoc.data() as UserData;
+        const savedQuizzes = userData?.quizzes?.savedQuizzes || [];
+        const userQuizzes = userData?.quizzes?.userQuizzes || [];
+    
+        // Find selected quiz details
+        const quizId = results.find(r => r.type === "Save Quiz")?.id;
+        const quizName = results.find(r => r.type === "Save Quiz")?.title;
+        const languageCode = results.find(r => r.type ==="Save Quiz")?.languageCode;
+    
+        if (!quizId || !quizName) return;
+    
+        // Check if the quiz is already saved using originalId
+        if (savedQuizzes.some((quiz: Quiz) => quiz.originalId === quizId)) {
+            setResults(
+                results.map(result =>
+                    result.id === quizId ? { ...result, type: "Already saved!" } : result
+                )
+            );
+            return;
+        } else if (userQuizzes.includes(quizId)) {
+            setResults(
+                results.map(result =>
+                    result.id === quizId ? { ...result, type: "This is your Quiz!" } : result
+                )
+            );
+            return;
+        }
+    
+        // Create a copy & get the new quiz ID
+        const newQuizId = await makeCopy(quizId);
+        if (!newQuizId) return;
+    
+        // Store with originalId field
+        await updateDoc(userDocRef, {
+            "quizzes.savedQuizzes": arrayUnion({ id: newQuizId, originalId: quizId, name: quizName, languageCode: languageCode }),
+        });
+    
+        // Update UI without including saved quizzes
+        setResults(
+            results
+                .filter(result => result.type !== "Already saved!") // Remove duplicate messages
+                .map(result =>
+                    result.id === quizId ? { ...result, type: "Quiz saved!" } : result
+                )
+        );
+    
+        console.log("Quiz saved successfully!");
+    };
+    
+    const makeCopy = async (originalQuizId: string): Promise<string | null> => {
+        try {
+            const quizDocRef = doc(FIREBASE_DB, "quizzes", originalQuizId);
+            const quizDoc = await getDoc(quizDocRef);
+    
+            if (!quizDoc.exists()) {
+                console.error("Quiz not found");
+                return null;
+            }
+    
+            const quizData = quizDoc.data();
+            if (!quizData) return null;
+    
+            const newQuizData = {
+                ...quizData,
+                info: {
+                    ...quizData.info,
+                    owner: user?.email ?? "",
+                    timesPlayed: 0,
+                    isOriginal: false
+                },
+            };
+    
+            const newQuizRef = doc(collection(FIREBASE_DB, "quizzes"));
+            await setDoc(newQuizRef, newQuizData);
+    
+            console.log("Quiz copied successfully with ID:", newQuizRef.id);
+            return newQuizRef.id;
+        } catch (error) {
+            console.error("Error copying quiz:", error);
+            return null;
+        }
+    };
+    
 
     return (
         <>
@@ -164,6 +278,7 @@ const SearchPage = () => {
                                 title={result.title}
                                 subtitle={result.subtitle}
                                 avatar={result.avatar}
+                                languageCode={result.languageCode}
                                 onPress={() => {
                                     result.type === "Add Friend" ? addUser() : copyQuiz()
                                 }}

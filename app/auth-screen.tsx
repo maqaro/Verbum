@@ -67,6 +67,10 @@ export default function authScreen() {
             },
             missions: {
                 missionsCompleted: 0,
+            },
+            quizzes: {
+                userQuizzes: [],
+                savedQuizzes: []
             }
         })
     }
@@ -93,83 +97,82 @@ export default function authScreen() {
                                 <Text>Register</Text>
                             </TabsTrigger>
                         </TabsList>
-                            <TabsContent value='login'>
-                                <Card>
-                                    <CardHeader>
-                                        <CardTitle>Sign In</CardTitle>
-                                        <CardDescription>
-                                            Sign in to your account
-                                        </CardDescription>
-                                    </CardHeader>
-                                    <CardContent className='gap-4 native:gap-2'>
-                                        <View className='gap-1'>
-                                            <Label nativeID='email-login'>Email</Label>
-                                            <Input value={email} autoCapitalize="none" onChangeText={(text) => setEmail(text)}/>
-                                        </View>
-                                        <View className='gap-1'>
-                                            <Label nativeID='password-login'>Password</Label>
-                                            <Input secureTextEntry={true} value={password} autoCapitalize="none" onChangeText={(text) => setPassword(text)} />
-                                        </View>
-                                    </CardContent>
-                                    <CardFooter className="justify-center">
-                                        <Button 
-                                            className="bg-secondary" 
-                                            disabled={loading}
-                                            onPress={() => {
-                                                setLoading(true);
-                                                signIn();
-                                                setEmail('');
-                                                setPassword('');
-                                                setTimeout(() => setLoading(false), 2000);
-                                            }}
-                                        >
-                                            {loading ? (
-                                                <ActivityIndicator color="hsl(var(--primary))" />
-                                            ) : (
-                                                <Text className="text-primary">Sign In</Text>
-                                            )}
-                                        </Button>
-                                    </CardFooter>
-                                </Card>
-                            </TabsContent>
-                            <TabsContent value='register'>
-                                <Card>
-                                    <CardHeader>
-                                        <CardTitle>Sign Up</CardTitle>
-                                        <CardDescription>
-                                            Create a new account
-                                        </CardDescription>
-                                    </CardHeader>
-                                    <CardContent className='gap-4 native:gap-2'>
-                                        <View className='gap-1'>
-                                            <Label nativeID='email-register'>Email</Label>
-                                            <Input value={email} autoCapitalize="none" onChangeText={(text) => setEmail(text)} />
-                                        </View>
-                                        <View className='gap-1'>
-                                            <Label nativeID='password-register'>Password</Label>
-                                            <Input secureTextEntry={true} value={password} autoCapitalize="none" onChangeText={(text) => setPassword(text)}/>
-                                        </View>
-                                    </CardContent>
-                                    <CardFooter className="justify-center">
-                                        <Button 
-                                            className="bg-secondary" 
-                                            disabled={loading}
-                                            onPress={() => {
-                                                setLoading(true);
-                                                signUp();
-                                                setTimeout(() => setLoading(false), 2000);
-                                            }}
-                                        >
-                                            {loading ? (
-                                                <ActivityIndicator color="hsl(var(--primary))" />
-                                            ) : (
-                                                <Text className="text-primary">Sign Up</Text>
-                                            )}
-                                        </Button>
-                                    </CardFooter>
-                                </Card>
-                            </TabsContent>
-                        
+                        <TabsContent value='login'>
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle>Sign In</CardTitle>
+                                    <CardDescription>
+                                        Sign in to your account
+                                    </CardDescription>
+                                </CardHeader>
+                                <CardContent className='gap-4 native:gap-2'>
+                                    <View className='gap-1'>
+                                        <Label nativeID='email-login'>Email</Label>
+                                        <Input value={email} autoCapitalize="none" onChangeText={(text) => setEmail(text)}/>
+                                    </View>
+                                    <View className='gap-1'>
+                                        <Label nativeID='password-login'>Password</Label>
+                                        <Input secureTextEntry={true} value={password} autoCapitalize="none" onChangeText={(text) => setPassword(text)} />
+                                    </View>
+                                </CardContent>
+                                <CardFooter className="justify-center">
+                                    <Button 
+                                        className="bg-secondary" 
+                                        disabled={loading}
+                                        onPress={() => {
+                                            setLoading(true);
+                                            signIn();
+                                            setEmail('');
+                                            setPassword('');
+                                            setTimeout(() => setLoading(false), 2000);
+                                        }}
+                                    >
+                                        {loading ? (
+                                            <ActivityIndicator color="hsl(var(--primary))" />
+                                        ) : (
+                                            <Text className="text-primary">Sign In</Text>
+                                        )}
+                                    </Button>
+                                </CardFooter>
+                            </Card>
+                        </TabsContent>
+                        <TabsContent value='register'>
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle>Sign Up</CardTitle>
+                                    <CardDescription>
+                                        Create a new account
+                                    </CardDescription>
+                                </CardHeader>
+                                <CardContent className='gap-4 native:gap-2'>
+                                    <View className='gap-1'>
+                                        <Label nativeID='email-register'>Email</Label>
+                                        <Input value={email} autoCapitalize="none" onChangeText={(text) => setEmail(text)} />
+                                    </View>
+                                    <View className='gap-1'>
+                                        <Label nativeID='password-register'>Password</Label>
+                                        <Input secureTextEntry={true} value={password} autoCapitalize="none" onChangeText={(text) => setPassword(text)}/>
+                                    </View>
+                                </CardContent>
+                                <CardFooter className="justify-center">
+                                    <Button 
+                                        className="bg-secondary" 
+                                        disabled={loading}
+                                        onPress={() => {
+                                            setLoading(true);
+                                            signUp();
+                                            setTimeout(() => setLoading(false), 2000);
+                                        }}
+                                    >
+                                        {loading ? (
+                                            <ActivityIndicator color="hsl(var(--primary))" />
+                                        ) : (
+                                            <Text className="text-primary">Sign Up</Text>
+                                        )}
+                                    </Button>
+                                </CardFooter>
+                            </Card>
+                        </TabsContent>
                     </Tabs>
                 </View>
             </TouchableWithoutFeedback>

@@ -2,6 +2,7 @@ import { View, TouchableOpacity } from "react-native";
 import { Text } from "./ui/text";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Card, CardContent, CardFooter, CardTitle } from "./ui/card";
+import FlagAvatar from "./FlagAvatar";
 
 interface SearchResultCardProps {
     id: string;
@@ -10,6 +11,7 @@ interface SearchResultCardProps {
     subtitle: string;
     avatar?: string;
     onPress?: () => void;
+    languageCode?: string;
 }
 
 const SearchResultCard = ({
@@ -18,7 +20,8 @@ const SearchResultCard = ({
     title,
     subtitle,
     avatar,
-    onPress
+    onPress,
+    languageCode,
 }: SearchResultCardProps) => {
     return (
         <TouchableOpacity onPress={onPress} className="w-full active:opacity-0">
@@ -45,11 +48,7 @@ const SearchResultCard = ({
                     {avatar ? (
                         <AvatarImage source={{ uri: avatar }} />
                     ) : (
-                        <AvatarFallback>
-                            <Text className='text-lg font-bold'>
-                                {title.substring(0, 2).toUpperCase()}
-                            </Text>
-                        </AvatarFallback>
+                        <FlagAvatar languageCode={languageCode || "EN"} />
                     )}
                 </Avatar>
             </Card>

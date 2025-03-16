@@ -1,5 +1,5 @@
 import { ScrollView, View , RefreshControl} from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Stack } from "expo-router";
 import Headerspace from "~/components/HeaderSpace";
 import { Text } from "~/components/ui/text";
@@ -86,7 +86,7 @@ const Leaderboard = () => {
                     </TabsList>
                     <TabsContent value="All" className="w-full bg-background mb-24">
                         <ScrollView 
-                            className="w-full bg-background"
+                            className="w-full h-full bg-background"
                             showsVerticalScrollIndicator={false}
                         >
                             <RefreshControl
@@ -108,7 +108,7 @@ const Leaderboard = () => {
                     </TabsContent>
                     <TabsContent value="Friends" className="w-full bg-background mb-24">
                         <ScrollView 
-                            className="w-full bg-background"
+                            className="w-full h-full bg-background"
                             showsVerticalScrollIndicator={false}
                         >
                             <RefreshControl

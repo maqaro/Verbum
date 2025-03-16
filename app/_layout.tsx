@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { FIREBASE_AUTH } from "~/FirebaseConfig";
 import "../global.css";
+import { PortalHost } from '@rn-primitives/portal';
 
 export default function RootLayout() {
   const [user, setUser] = useState<User | null>(null);
@@ -34,14 +35,17 @@ export default function RootLayout() {
   }
 
   return (
-    <SafeAreaProvider>
-      <Stack screenOptions={{ headerShown: false }}>
-        {user ? (
-          <Stack.Screen name="tabs" options={{ headerShown: false }} />
-        ) : (
-          <Stack.Screen name="auth-screen" options={{ headerShown: false }} />
-        )}
-      </Stack>
-    </SafeAreaProvider>
+    <>
+      <SafeAreaProvider>
+        <Stack screenOptions={{ headerShown: false }}>
+          {user ? (
+            <Stack.Screen name="tabs" options={{ headerShown: false }} />
+          ) : (
+            <Stack.Screen name="auth-screen" options={{ headerShown: false }} />
+          )}
+        </Stack>
+      </SafeAreaProvider>
+      <PortalHost/>
+    </>
   );
 }

@@ -5,14 +5,17 @@ export * from './ChevronLeft';
 export * from './ChevronRight';
 export * from './ChevronUp';
 export * from './CirclePlus';
+export * from './Trash'
 export * from './Flame';
 export * from './Globe';
 export * from './House';
 export * from './LandPlot';
 export * from './LibraryBig';
+export * from './Play'
 export * from './Search';
 export * from './Settings';
 export * from './Star';
+export * from './SquarePen'
 export * from './Trophy';
 export * from './User';
 export * from './UserPen';

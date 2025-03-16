@@ -9,6 +9,7 @@ import { FIREBASE_AUTH } from "~/FirebaseConfig";
 import { useState, useEffect } from "react";
 import SettingItem from "~/components/SettingsItem";
 import { useColorScheme } from '~/lib/useColorScheme';
+import React from 'react'
 
 const Settings = () => {
     const router = useRouter();

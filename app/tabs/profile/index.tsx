@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { TouchableOpacity, View } from "react-native";
-import { Settings, UserPen, Star, Globe, LandPlot } from "~/lib/icons";
+import { Settings, UserPen, Star, Globe, Flame } from "~/lib/icons";
 import { Text } from "~/components/ui/text";
 import { router, Stack } from "expo-router";
 import { Card } from "~/components/ui/card";
@@ -16,6 +16,7 @@ const Profile = () => {
     const user = FIREBASE_AUTH.currentUser
     const [tabValue, setTabValue] = useState('badges');
     const [points, setPoints] = useState(0);
+    const [streak, setStreak] = useState(0);
     const [userName, setUserName] = useState('');
     const [avatar, setAvatar] = useState<string | undefined>(undefined);
     const [userRank, setUserRank] = useState<number | null>(null);
@@ -25,6 +26,7 @@ const Profile = () => {
             const userDoc = await getDoc(doc(FIREBASE_DB, "userInfo", user.email));
             const data = userDoc.data()
             setPoints(data?.points || 0);
+            setStreak(data?.streakInfo.currentStreak)
             setAvatar(data?.avatar.uri || undefined);
             setUserName(data?.details.userName)
         }
@@ -84,12 +86,12 @@ const Profile = () => {
             <View className='bg-background flex-1 items-center p-4'>
                 <Card className="bg-background flex-1 items-center m-4">
                     <Avatar alt="avatar" className="w-32 h-32 m-6">
-                        <AvatarImage source={{uri: avatar}}/>
+                        <AvatarImage source={{ uri: avatar }}/>
                         <AvatarFallback>
-                            <Text className="text-4xl font-bold text-foreground">{userName.substring(0,2)}</Text>
+                            <Text className="text-4xl font-bold text-foreground">{ userName.substring(0,2) }</Text>
                         </AvatarFallback>
                     </Avatar>
-                    <Card className='bg-card w-full m-4 p-6 items-center'>
+                    <Card className='bg-card w-full m-4 p-4 items-center'>
                         <View className='flex-row justify-center'>
                             <View className='flex-1 items-center'>
                                 <Star className='color-primary'/>
@@ -100,12 +102,18 @@ const Profile = () => {
                             <View className='flex-1 items-center'>
                                 <Globe className='color-primary'/>
                                 <Text className='text-primary font-bold'>Rank</Text>
-                                <Text className='text-xl font-bold'>{userRank !== null ? `#${userRank}` : 'N/A'}</Text>
+                                <Text className='text-xl font-bold'>{ userRank !== null ? `#${userRank}` : 'N/A' }</Text>
+                            </View>
+                            <Separator orientation='vertical'/>
+                            <View className='flex-1 items-center'>
+                                <Flame className='color-primary'/>
+                                <Text className='text-primary font-bold'>Streak</Text>
+                                <Text className='text-xl font-bold'>{ streak }</Text>
                             </View>
                         </View>
                     </Card>
                     <Tabs
-                    value={tabValue}
+                    value={ tabValue }
                     onValueChange={setTabValue}
                     className='bg-backgorund p-2'
                     >
@@ -121,13 +129,13 @@ const Profile = () => {
                             </TabsTrigger>
                         </TabsList>
                         <TabsContent value='badges'>
-                            {/* to be finished */}
+                            { /* to be finished */ }
                         </TabsContent>
                         <TabsContent value='stats'>
-                            {/* to be finished */}
+                            { /* to be finished */ }
                         </TabsContent>
                         <TabsContent value='friends'>
-                            {/* to be finished */}
+                            { /* to be finished */ }
                         </TabsContent>
                     </Tabs>
                 </Card>
