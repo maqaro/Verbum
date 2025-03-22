@@ -17,5 +17,6 @@ export * from './Settings';
 export * from './Star';
 export * from './SquarePen'
 export * from './Trophy';
+export * from './Upload';
 export * from './User';
 export * from './UserPen';

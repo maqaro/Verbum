@@ -83,7 +83,9 @@ const QuizInfo = () => {
                                 <Play className="text-secondary w-6 h-6"/>
                                 <Text className="text-lg font-semibold text-secondary">Play</Text>
                             </Button>
-                            <Button className="w-full flex-row items-center justify-center gap-2 py-3 bg-secondary rounded-xl active:scale-95">
+                            <Button className="w-full flex-row items-center justify-center gap-2 py-3 bg-secondary rounded-xl active:scale-95"
+                                onPress={() => {router.push('/tabs/lessons/scan')}}
+                            >
                                 <Camera className="text-primary w-6 h-6"/>
                                 <Text className="text-lg font-semibold text-primary">Scan</Text>
                             </Button>

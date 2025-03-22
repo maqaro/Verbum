@@ -9,7 +9,7 @@ import Headerspace from "~/components/HeaderSpace"
 import { Stack, useRouter } from "expo-router"
 import { Camera, ChevronLeft } from '~/lib/icons'
 import { FIREBASE_AUTH, FIREBASE_DB } from "~/FirebaseConfig"
-import { doc, DocumentSnapshot, getDoc, updateDoc } from "firebase/firestore"
+import { doc, getDoc, updateDoc } from "firebase/firestore"
 import * as ImagePicker from 'expo-image-picker'
 
 const Edit = () => {
