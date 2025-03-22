@@ -48,7 +48,7 @@ const SearchResultCard = ({
                     {avatar ? (
                         <AvatarImage source={{ uri: avatar }} />
                     ) : (
-                        <FlagAvatar languageCode={languageCode || "EN"} />
+                        <FlagAvatar languageCode={languageCode || "AR"} />
                     )}
                 </Avatar>
             </Card>

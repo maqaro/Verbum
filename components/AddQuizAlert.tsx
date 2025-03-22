@@ -16,7 +16,7 @@ const SUPPORTED_LANGUAGES = [
 const AddQuizAlert = () => {
     const [modalVisible, setModalVisible] = useState(false);
     const [quizName, setQuizName] = useState("");
-    const [selectedLanguage, setSelectedLanguage] = useState("EN");
+    const [selectedLanguage, setSelectedLanguage] = useState("AR");
     const [isCreating, setIsCreating] = useState(false);
     const [error, setError] = useState("");
     
@@ -61,7 +61,7 @@ const AddQuizAlert = () => {
             
             // Reset form and close modal
             setQuizName("");
-            setSelectedLanguage("EN");
+            setSelectedLanguage("AR");
             setModalVisible(false);
             
         } catch (error) {

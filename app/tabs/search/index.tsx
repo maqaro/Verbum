@@ -6,10 +6,8 @@ import { Input } from '~/components/ui/input';
 import { Text } from '~/components/ui/text';
 import { Search } from '~/lib/icons'
 import { FIREBASE_DB, FIREBASE_AUTH } from '~/FirebaseConfig';
-import { collection, getDocs, query, where, or, getDoc, doc, updateDoc, setDoc, arrayUnion } from 'firebase/firestore';
+import { collection, getDocs, query, where, getDoc, doc, updateDoc, setDoc, arrayUnion } from 'firebase/firestore';
 import SearchResultCard from '~/components/SearchCardResults';
-import { Languages } from 'lucide-react-native';
-import FlagAvatar from '~/components/FlagAvatar';
 
 interface SearchResult {
     id: string;
@@ -189,8 +187,6 @@ const SearchPage = () => {
                     result.id === quizId ? { ...result, type: "Quiz saved!" } : result
                 )
         );
-    
-        console.log("Quiz saved successfully!");
     };
     
     const makeCopy = async (originalQuizId: string): Promise<string | null> => {
@@ -218,8 +214,6 @@ const SearchPage = () => {
     
             const newQuizRef = doc(collection(FIREBASE_DB, "quizzes"));
             await setDoc(newQuizRef, newQuizData);
-    
-            console.log("Quiz copied successfully with ID:", newQuizRef.id);
             return newQuizRef.id;
         } catch (error) {
             console.error("Error copying quiz:", error);
