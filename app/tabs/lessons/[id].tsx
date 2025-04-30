@@ -73,10 +73,6 @@ const QuizInfo = () => {
                             <Text className="text-4xl font-semibold text-foreground">Times Played</Text>
                             <Text className="text-3xl font-bold text-primary/40">{ quizData?.info.timesPlayed} Plays</Text>
                         </View>
-                        <View className="mb-6">
-                            <Text className="text-4xl font-semibold text-foreground">Words Learnt</Text>
-                            <Text className="text-3xl font-bold text-primary/40">{ quizData?.info.wordsLearnt} words</Text>
-                        </View>
                         <View className="w-full">
                             <Button 
                                 className={`w-full flex-row items-center justify-center gap-2 py-3 mb-4 rounded-xl active:scale-95 ${

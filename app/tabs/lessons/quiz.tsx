@@ -1,32 +1,127 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import { TouchableOpacity, View} from 'react-native';
 import { Text } from '~/components/ui/text';
 import { Card } from '~/components/ui/card';
 import { Progress } from "~/components/ui/progress";
 import { Button } from '~/components/ui/button';
-import { router } from 'expo-router';
+import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { FIREBASE_AUTH, FIREBASE_DB } from '~/FirebaseConfig';
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { doc, DocumentData, getDoc, updateDoc } from 'firebase/firestore';
 
 const Quiz = () => {
     const user = FIREBASE_AUTH.currentUser;
-    const [totalQuestions] = useState<number>(2);
+    const { id } = useLocalSearchParams();
+    const [quizData, setQuizData] = useState<DocumentData | null>(null);
+    const [quizWords, setQuizWords] = useState<Array<{original: string, translated: string}>>([]);
+    const [availableWords, setAvailableWords] = useState<Array<{original: string, translated: string}>>([]);
+    const [totalQuestions, setTotalQuestions] = useState<number>(5);
     const [questionsCompleted, setQuestionsCompleted] = useState<number>(0);
     const [answeredCorrect, setAnsweredCorrect] = useState<number>(0);
-    const [correctAnswer, setCorrect] = useState<String>('option 1')
+    const [currentQuestion, setCurrentQuestion] = useState<{original: string, translated: string} | null>(null);
+    const [options, setOptions] = useState<string[]>([]);
     const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
-    const [words, setWords] = useState<string[]>(['option 1', 'option 2', 'option 3', 'option 4']);
     const [answerSubmitted, setAnswerSubmitted] = useState<boolean>(false);
     const [quizCompleted, setQuizCompleted] = useState<boolean>(false);
-
+    
     const progress = (questionsCompleted/totalQuestions) * 100;
 
+    const getQuiz = async () => {
+        try {
+            const quizDoc = await getDoc(doc(FIREBASE_DB, "quizzes", id as string));
+            if (!quizDoc.exists()) {
+                alert("Quiz not found");
+                router.back();
+                return;
+            }
+            
+            const data = quizDoc.data();
+            setQuizData(data);
+            
+            if (data.words && data.words.length > 0) {
+                setQuizWords(data.words);
+                setAvailableWords([...data.words]);
+                
+                // Set a random number of questions between 5 and 10
+                // but no more than the number of available words
+                const maxQuestions = Math.min(data.words.length, 10);
+                const randomQuestions = Math.max(5, Math.floor(Math.random() * (maxQuestions - 4)) + 5);
+                setTotalQuestions(randomQuestions);
+                console.log(`Quiz will have ${randomQuestions} questions from ${data.words.length} available words`);
+            } else {
+                alert("This quiz has no words yet");
+                router.back();
+            }
+        } catch (error) {
+            console.error("Error loading quiz:", error);
+            alert("Error loading quiz");
+        }
+    };
+
+    useFocusEffect(
+        useCallback(() => {
+            getQuiz();
+        }, [])
+    );
+
+    // Set up the quiz when words are loaded
+    useEffect(() => {
+        if (quizWords.length > 0) {
+            prepareNextQuestion();
+        }
+    }, [quizWords]);
+
+    // Prepare a new question with options
+    const prepareNextQuestion = () => {
+        if (availableWords.length === 0) {
+            endQuiz();
+            return;
+        }
+        
+        // Get a random word from the remaining words
+        const randomIndex = Math.floor(Math.random() * availableWords.length);
+        const questionWord = availableWords[randomIndex];
+        
+        // Remove the selected word so it won't be repeated
+        const updatedAvailableWords = [...availableWords];
+        updatedAvailableWords.splice(randomIndex, 1);
+        setAvailableWords(updatedAvailableWords);
+        
+        setCurrentQuestion(questionWord);
+        
+        // Create options (1 correct + 3 incorrect)
+        let optionsArray = [questionWord.translated];
+        
+        // Get incorrect options from the full word pool (could include already used words for more options)
+        const potentialIncorrectOptions = quizWords
+            .filter(word => word.translated !== questionWord.translated)
+            .map(word => word.translated);
+        
+        // Shuffle potential incorrect options
+        const shuffledIncorrect = [...potentialIncorrectOptions].sort(() => Math.random() - 0.5);
+        
+        // Add incorrect options (up to 3)
+        for (let i = 0; i < 3 && i < shuffledIncorrect.length; i++) {
+            optionsArray.push(shuffledIncorrect[i]);
+        }
+        
+        // If we don't have enough words, add placeholder options
+        while (optionsArray.length < 4) {
+            optionsArray.push(`Option ${optionsArray.length + 1}`);
+        }
+        
+        // Shuffle options
+        optionsArray = optionsArray.sort(() => Math.random() - 0.5);
+        
+        setOptions(optionsArray);
+    };
+
     const handleSubmit = () => {
-        if (selectedAnswer === null) return;
+        if (selectedAnswer === null || !currentQuestion) return;
         
         setAnswerSubmitted(true);
         setQuestionsCompleted(prev => prev + 1);
-        if (selectedAnswer === correctAnswer){
+        
+        if (selectedAnswer === currentQuestion.translated) {
             setAnsweredCorrect(prev => prev + 1);
         }
     };
@@ -38,11 +133,11 @@ const Quiz = () => {
                 : 'border-border';
         }
         
-        if (option === correctAnswer) {
+        if (option === currentQuestion?.translated) {
             return 'border-green-500 bg-green-100';
         }
         
-        if (selectedAnswer === option && selectedAnswer !== correctAnswer) {
+        if (selectedAnswer === option && selectedAnswer !== currentQuestion?.translated) {
             return 'border-red-500 bg-red-100';
         }
         
@@ -56,37 +151,53 @@ const Quiz = () => {
                 : 'text-foreground';
         }
         
-        if (option === correctAnswer) {
+        if (option === currentQuestion?.translated) {
             return 'font-semibold text-green-700';
         }
         
-        if (selectedAnswer === option && selectedAnswer !== correctAnswer) {
+        if (selectedAnswer === option && selectedAnswer !== currentQuestion?.translated) {
             return 'font-semibold text-red-700';
         }
         
         return 'text-foreground';
     };
 
-    const fetchData = () => {
-        
-    }
-
     const endQuiz = () => {
         setQuizCompleted(true);
-        updateUserXP(answeredCorrect)
-    }
+        updateUserXP(answeredCorrect);
+        updateQuizStats();
+    };
 
     const updateUserXP = async (points: number) => {
-        if (user?.email){
-            const userDoc = await getDoc(doc(FIREBASE_DB, "userInfo", user?.email)); 
-            if (userDoc.exists()){
-                const data = userDoc.data();
-                await updateDoc(doc(FIREBASE_DB, "userInfo", user.email), {
-                    points: data.points + Math.round(points * 1.5)
-                });
+        if (user?.email) {
+            try {
+                const userDoc = await getDoc(doc(FIREBASE_DB, "userInfo", user?.email)); 
+                if (userDoc.exists()) {
+                    const data = userDoc.data();
+                    await updateDoc(doc(FIREBASE_DB, "userInfo", user.email), {
+                        points: data.points + Math.round(points * 1.5)
+                    });
+                }
+            } catch (error) {
+                console.error("Error updating user XP:", error);
             }
         }
-    }
+    };
+    
+    const updateQuizStats = async () => {
+        if (!id) return;
+        
+        try {
+            // Update times played
+            const currentTimesPlayed = quizData?.info?.timesPlayed || 0;
+            
+            await updateDoc(doc(FIREBASE_DB, "quizzes", id.toString()), {
+                "info.timesPlayed": currentTimesPlayed + 1
+            });
+        } catch (error) {
+            console.error("Error updating quiz stats:", error);
+        }
+    };
 
     const handleNextQuestion = () => {
         setSelectedAnswer(null);
@@ -95,7 +206,7 @@ const Quiz = () => {
         if (questionsCompleted >= totalQuestions) {
             endQuiz();
         } else {
-            // TODO: update the questions
+            prepareNextQuestion();
         }
     };
 
@@ -147,14 +258,14 @@ const Quiz = () => {
                     <View className='w-full pb-4'>
                         <Progress value={progress} className='h-6 w-full' indicatorClassName='bg-primary'/>
                     </View>
-                    <Text className="text-4xl font-bold text-foreground">Select the correct answer</Text>
+                    <Text className="text-4xl font-bold text-foreground">Select the correct translation</Text>
                 </View>
                 <View className='flex-1 flex justify-between'>
                     <View className='items-center px-6'>
                         <Card className='w-full h-80 p-6 rounded-2xl bg-card shadow-md'>
                             <View className="w-full h-full flex items-center justify-center">
                                 <Text className='text-5xl font-semibold text-center text-foreground'>
-                                    {correctAnswer}
+                                    {currentQuestion?.original || 'Loading...'}
                                 </Text>
                             </View>
                         </Card>
@@ -162,7 +273,7 @@ const Quiz = () => {
                     
                     <View className='px-6 pb-6'>
                         <View className="flex-row flex-wrap justify-between mb-4">
-                            {words.map((option) => (
+                            {options.map((option) => (
                                 <TouchableOpacity 
                                     key={option}
                                     onPress={() => !answerSubmitted && setSelectedAnswer(option)}
