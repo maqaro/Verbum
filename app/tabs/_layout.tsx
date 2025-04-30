@@ -8,16 +8,21 @@ export default () => {
     const isDark = colorScheme === 'dark';
 
     return (
-        <Tabs screenOptions={{
-            headerShown: false,
-            tabBarStyle: {
-                backgroundColor: isDark ? 'hsl(240 10% 3.9%)' : 'hsl(0 0% 100%)',
-                borderTopColor: isDark ? 'hsl(240 3.7% 15.9%)' : 'hsl(240 5.9% 90%)',
-                height: 60,
-            },
-            tabBarActiveTintColor: 'hsl(270 100% 59%)',
-            tabBarInactiveTintColor: isDark ? 'hsl(240 5% 64.9%)' : 'hsl(240 3.8% 46.1%)', 
-        }}>
+        <Tabs 
+            screenOptions={({ route }) => {
+                return {
+                    headerShown: false,
+                    tabBarStyle: {
+                        backgroundColor: isDark ? 'hsl(240 10% 3.9%)' : 'hsl(0 0% 100%)',
+                        borderTopColor: isDark ? 'hsl(240 3.7% 15.9%)' : 'hsl(240 5.9% 90%)',
+                        height: 60,
+                        display: route.name.includes('quiz') ? 'none' : 'flex',
+                    },
+                    tabBarActiveTintColor: 'hsl(270 100% 59%)',
+                    tabBarInactiveTintColor: isDark ? 'hsl(240 5% 64.9%)' : 'hsl(240 3.8% 46.1%)',
+                };
+            }}
+        >
             <Tabs.Screen 
                 name="home" 
                 options={{ 
@@ -27,42 +32,42 @@ export default () => {
                     tabBarLabel: 'Home'
                 }}
             />
-        <Tabs.Screen 
-            name="search"
-            options={{ 
-                tabBarIcon: ({ color, size }) => (
-                    <Search color={color} size={size} />
-                ),
-                tabBarLabel: 'Search'
-            }}
-        />
-        <Tabs.Screen 
-            name="lessons" 
-            options={{ 
-                tabBarIcon: ({ color, size }) => (
-                    <LibraryBig color={color} size={size} />
-                ),
-                tabBarLabel: 'Lessons'
-            }}
-        />
-        <Tabs.Screen 
-            name="leaderboard" 
-            options={{ 
-                tabBarIcon: ({ color, size }) => (
-                    <Trophy color={color} size={size} />
-                ),
-                tabBarLabel: 'Leaderboard'
-            }}
-        />
-        <Tabs.Screen 
-            name="profile"
-            options={{ 
-                tabBarIcon: ({ color, size }) => (
-                    <User color={color} size={size} />
-                ),
-                tabBarLabel: 'Profile'
-            }}
-        />
-    </Tabs>
+            <Tabs.Screen 
+                name="search"
+                options={{ 
+                    tabBarIcon: ({ color, size }) => (
+                        <Search color={color} size={size} />
+                    ),
+                    tabBarLabel: 'Search'
+                }}
+            />
+            <Tabs.Screen 
+                name="lessons" 
+                options={{ 
+                    tabBarIcon: ({ color, size }) => (
+                        <LibraryBig color={color} size={size} />
+                    ),
+                    tabBarLabel: 'Lessons'
+                }}
+            />
+            <Tabs.Screen 
+                name="leaderboard" 
+                options={{ 
+                    tabBarIcon: ({ color, size }) => (
+                        <Trophy color={color} size={size} />
+                    ),
+                    tabBarLabel: 'Leaderboard'
+                }}
+            />
+            <Tabs.Screen 
+                name="profile"
+                options={{ 
+                    tabBarIcon: ({ color, size }) => (
+                        <User color={color} size={size} />
+                    ),
+                    tabBarLabel: 'Profile'
+                }}
+            />
+        </Tabs>
     )
 }

@@ -3,24 +3,11 @@ import { View } from "react-native";
 import Headerspace from "~/components/HeaderSpace";
 import { Text } from "~/components/ui/text";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
-import { Button } from "~/components/ui/button";
-import { CirclePlus } from "~/lib/icons";
 import { RefreshControl, ScrollView } from "react-native";
 import React, { useCallback, useState } from "react";
 import QuizCard from "~/components/QuizCard";
 import { FIREBASE_AUTH, FIREBASE_DB } from "~/FirebaseConfig";
 import { doc, getDoc } from "firebase/firestore";
-import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-    AlertDialogTrigger,
-  } from '~/components/ui/alert-dialog';
 import AddQuizAlert from "~/components/AddQuizAlert";
 
 interface QuizListEntry{
@@ -35,7 +22,6 @@ const Lessons = () => {
     const [userQuizzesList, setUserQuizzesList] = useState<QuizListEntry[]>([]);
     const [savedQuizzesList, SetSavedQuizzesList] = useState<QuizListEntry[]>([]);
     const [refreshing, setRefreshing] = useState<boolean>(false);
-    const [isPopup, setIsPopup] = useState<boolean>(false);
         
     const getQuizzes = async () => {
         if (user?.email){

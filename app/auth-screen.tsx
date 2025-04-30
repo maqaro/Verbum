@@ -29,7 +29,7 @@ export default function authScreen() {
         } finally {
             setLoading(false);
         }
-    }
+    } 
 
     const signUp = async () => {
         setLoading(true);
