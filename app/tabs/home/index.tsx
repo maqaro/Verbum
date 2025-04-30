@@ -10,7 +10,7 @@ import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { FIREBASE_AUTH, FIREBASE_DB } from "~/FirebaseConfig";
 
 const Home = () => {
-    const user = FIREBASE_AUTH.currentUser
+    const user = FIREBASE_AUTH.currentUser;
     const [refreshing, setRefreshing] = useState(false);
     const [streakInfo, setStreakInfo] = useState<{
         currentStreak: number;
@@ -39,48 +39,36 @@ const Home = () => {
 
     const updateStreak = async () => {
         if (!user?.email) return;
-
+        
         const today = new Date();
         today.setHours(0, 0, 0, 0);
-
+        
         const userDoc = await getDoc(doc(FIREBASE_DB, "userInfo", user.email));
         if (!userDoc.exists()) return;
-
-        const data = userDoc.data();
-        const lastLogin = data.streakInfo.lastLoggedIn ? new Date(data.streakInfo.lastLoggedIn) : null;
-        let newStreak = data.streakInfo.currentStreak || 0;
-
-        if (lastLogin) {
-            lastLogin.setHours(0, 0, 0, 0);
-            
-            if (lastLogin.getTime() === today.getTime()) {
-                return;
-            }
-            
-            const yesterday = new Date(today);
-            yesterday.setDate(yesterday.getDate() - 1);
-            if (lastLogin.getTime() === yesterday.getTime()) {
-                newStreak += 1;
-            } else {
-                newStreak = 1;
-            }
-        } else {
-            newStreak = 1;
-        }
-
+        
+        const { streakInfo = {} } = userDoc.data();
+        const lastLogin = streakInfo.lastLoggedIn ? new Date(streakInfo.lastLoggedIn) : null;
+        
+        const newStreak = lastLogin 
+            ? (lastLogin.setHours(0, 0, 0, 0), 
+                lastLogin.getTime() === today.getTime() ? streakInfo.currentStreak || 0 :
+                lastLogin.getTime() === new Date(today.getTime() - 86400000).getTime() 
+                ? (streakInfo.currentStreak || 0) + 1 : 1)
+            : 1;
+        
+        const highestStreak = Math.max(newStreak, streakInfo.highestStreak || 0);
+        
         await updateDoc(doc(FIREBASE_DB, "userInfo", user.email), {
             streakInfo: {
                 currentStreak: newStreak,
                 lastLoggedIn: today.toISOString(),
-                highestStreak: Math.max(newStreak, data.streakInfo.highestStreak || 0)
-            },
+                highestStreak
+            }
         });
-
-        setStreakInfo((prev) => ({
-            currentStreak: newStreak,
-            highestStreak: Math.max(newStreak, prev.highestStreak),
-            lastLoggedIn: today,
-        }));
+        
+        setStreakInfo({ 
+            currentStreak: newStreak, highestStreak, lastLoggedIn: today 
+        });
     };
 
     const onRefresh = useCallback(() => {

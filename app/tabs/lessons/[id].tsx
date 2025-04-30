@@ -5,15 +5,14 @@ import Headerspace from "~/components/HeaderSpace";
 import { Stack, useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import { Camera, ChevronLeft, Play, SquarePen, Trash } from '~/lib/icons';
 import { Card } from "~/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
+import { Avatar } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
-import { FIREBASE_AUTH, FIREBASE_DB } from "~/FirebaseConfig";
+import {FIREBASE_DB } from "~/FirebaseConfig";
 import { doc, DocumentData, getDoc } from "firebase/firestore";
 import FlagAvatar from "~/components/FlagAvatar";
 
 const QuizInfo = () => {
     const router = useRouter();
-    const user = FIREBASE_AUTH.currentUser
     const { id } = useLocalSearchParams();
     const [ quizData, setQuizData ] = useState<DocumentData>();
 
@@ -79,12 +78,46 @@ const QuizInfo = () => {
                             <Text className="text-3xl font-bold text-primary/40">{ quizData?.info.wordsLearnt} words</Text>
                         </View>
                         <View className="w-full">
-                            <Button className="w-full flex-row items-center justify-center gap-2 py-3 mb-4 bg-primary rounded-xl active:scale-95">
-                                <Play className="text-secondary w-6 h-6"/>
-                                <Text className="text-lg font-semibold text-secondary">Play</Text>
+                            <Button 
+                                className={`w-full flex-row items-center justify-center gap-2 py-3 mb-4 rounded-xl active:scale-95 ${
+                                    (!quizData?.words || quizData?.words.length < 1) 
+                                    ? 'bg-secondary' 
+                                    : 'bg-primary'
+                                }`}
+                                onPress={() => {
+                                    if (!quizData?.words || quizData?.words.length < 1) {
+                                        alert('This quiz has no words yet. Please add scans first.');
+                                        return;
+                                    }
+                                    router.push({
+                                        pathname: '/tabs/lessons/quiz',
+                                        params: { 
+                                            id: id,
+                                        }
+                                    });
+                                }}
+                                disabled={!quizData?.words || quizData?.words.length < 1}
+                            >
+                                <Play className={`w-6 h-6 ${
+                                    (!quizData?.words || quizData?.words.length < 1) 
+                                    ? 'text-primary' 
+                                    : 'text-secondary'
+                                }`}/>
+                                <Text className={`text-lg font-semibold ${
+                                    (!quizData?.words || quizData?.words.length < 1) 
+                                    ? 'text-primary' 
+                                    : 'text-secondary'
+                                }`}>
+                                    Play{(!quizData?.words || quizData?.words.length < 1) ? ' (Add scans first)' : ''}
+                                </Text>
                             </Button>
                             <Button className="w-full flex-row items-center justify-center gap-2 py-3 bg-secondary rounded-xl active:scale-95"
-                                onPress={() => {router.push('/tabs/lessons/scan')}}
+                                onPress={() => {router.push({
+                                    pathname: '/tabs/lessons/scan',
+                                    params: { 
+                                        id: id,
+                                    }
+                                });}}
                             >
                                 <Camera className="text-primary w-6 h-6"/>
                                 <Text className="text-lg font-semibold text-primary">Scan</Text>
