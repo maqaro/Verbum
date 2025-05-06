@@ -1,7 +1,7 @@
 import { View, Text, ScrollView, RefreshControl, TouchableOpacity } from "react-native";
 import React, { useCallback, useEffect, useState } from "react";
 import Headerspace from "~/components/HeaderSpace";
-import { Stack } from "expo-router";
+import { Stack, useFocusEffect } from "expo-router";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Progress } from "~/components/ui/progress";
 import { Flame } from "~/lib/icons";
@@ -72,10 +72,34 @@ const Home = () => {
         });
     };
 
+    const fetchLastPlayedQuiz = async () => {
+        if (user?.email) {
+            const userDoc = await getDoc(doc(FIREBASE_DB, "userInfo", user.email));
+            const data = userDoc.data();
+            const lastPlayedQuizId = data?.lastPlayedQuizId;
+
+            if (lastPlayedQuizId && lastPlayedQuizId !== "") {
+                const quizDoc = await getDoc(doc(FIREBASE_DB, "quizzes", lastPlayedQuizId));
+                const quizData = quizDoc.data();
+
+                if (quizData) {
+                    setLastPlayedQuiz({
+                        id: lastPlayedQuizId,
+                        title: quizData.info.name,
+                        languageCode: quizData.info.languageCode,
+                    });
+                }
+            } else {
+                setLastPlayedQuiz(null);
+            }
+        }
+    };
+
     const onRefresh = useCallback(() => {
         setRefreshing(true);
         fetchUserData();
         updateStreak();
+        fetchLastPlayedQuiz();
         setTimeout(() => setRefreshing(false), 500);
     }, []);
 
@@ -87,32 +111,13 @@ const Home = () => {
         initializeData();
     }, []);
 
-    useEffect(() => {
-        const fetchLastPlayedQuiz = async () => {
-            if (user?.email) {
-                const userDoc = await getDoc(doc(FIREBASE_DB, "userInfo", user.email));
-                const data = userDoc.data();
-                const lastPlayedQuizId = data?.lastPlayedQuizId;
-
-                if (lastPlayedQuizId && lastPlayedQuizId !== "") {
-                    const quizDoc = await getDoc(doc(FIREBASE_DB, "quizzes", lastPlayedQuizId));
-                    const quizData = quizDoc.data();
-
-                    if (quizData) {
-                        setLastPlayedQuiz({
-                            id: lastPlayedQuizId,
-                            title: quizData.info.name,
-                            languageCode: quizData.info.languageCode,
-                        });
-                    }
-                } else {
-                    setLastPlayedQuiz(null);
-                }
-            }
-        };
-
-        fetchLastPlayedQuiz();
-    }, [user]);
+    useFocusEffect(
+        useCallback(() => {
+            fetchLastPlayedQuiz();
+            fetchUserData();
+            updateStreak();
+        }, [])
+    );
 
     return (
         <>

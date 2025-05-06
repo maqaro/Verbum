@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { TouchableOpacity, View } from "react-native";
+import { ScrollView, TouchableOpacity, View } from "react-native";
 import { Settings, UserPen, Star, Globe, Flame } from "~/lib/icons";
 import { Text } from "~/components/ui/text";
 import { router, Stack } from "expo-router";
@@ -183,8 +183,10 @@ const Profile = () => {
                                 <Text>Friends</Text>
                             </TabsTrigger>
                         </TabsList>
-                        <TabsContent value='badges'>
-                            <BadgeGrid badges={generateBadges()} />
+                        <TabsContent value='badges' style={{ height: 350 }}>
+                            <ScrollView showsVerticalScrollIndicator={false}>
+                                <BadgeGrid badges={generateBadges()} />
+                            </ScrollView>
                         </TabsContent>
                         <TabsContent value='stats'>
                             { /* to be finished */ }
