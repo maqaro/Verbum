@@ -71,7 +71,8 @@ export default function authScreen() {
             quizzes: {
                 userQuizzes: [],
                 savedQuizzes: []
-            }
+            },
+            lastPlayedQuizId: ""
         })
     }
 

@@ -46,7 +46,6 @@ const Quiz = () => {
                 const maxQuestions = Math.min(data.words.length, 10);
                 const randomQuestions = Math.max(5, Math.floor(Math.random() * (maxQuestions - 4)) + 5);
                 setTotalQuestions(randomQuestions);
-                console.log(`Quiz will have ${randomQuestions} questions from ${data.words.length} available words`);
             } else {
                 alert("This quiz has no words yet");
                 router.back();
@@ -166,6 +165,7 @@ const Quiz = () => {
         setQuizCompleted(true);
         updateUserXP(answeredCorrect);
         updateQuizStats();
+        updateLastPlayedQuiz(id as string);
     };
 
     const updateUserXP = async (points: number) => {
@@ -196,6 +196,18 @@ const Quiz = () => {
             });
         } catch (error) {
             console.error("Error updating quiz stats:", error);
+        }
+    };
+
+    const updateLastPlayedQuiz = async (quizId: string) => {
+        if (user?.email) {
+            try {
+                await updateDoc(doc(FIREBASE_DB, "userInfo", user.email), {
+                    lastPlayedQuizId: quizId
+                });
+            } catch (error) {
+                console.error("Error updating last played quiz: ", error);
+            }
         }
     };
 

@@ -5,9 +5,9 @@ import { Stack } from "expo-router";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Progress } from "~/components/ui/progress";
 import { Flame } from "~/lib/icons";
-import { Avatar, AvatarFallback } from "~/components/ui/avatar";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { FIREBASE_AUTH, FIREBASE_DB } from "~/FirebaseConfig";
+import LastPlayedQuizCard from '~/components/LastPlayedQuizCard';
 
 const Home = () => {
     const user = FIREBASE_AUTH.currentUser;
@@ -22,6 +22,7 @@ const Home = () => {
         lastLoggedIn: null,
     });
     const progressValue = streakInfo.highestStreak > 0 ? (streakInfo.currentStreak / streakInfo.highestStreak) * 100 : 0;
+    const [lastPlayedQuiz, setLastPlayedQuiz] = useState<{ id: string; title: string; languageCode: string } | null>(null);
 
     const fetchUserData = async () => {
         if (user?.email){
@@ -86,6 +87,33 @@ const Home = () => {
         initializeData();
     }, []);
 
+    useEffect(() => {
+        const fetchLastPlayedQuiz = async () => {
+            if (user?.email) {
+                const userDoc = await getDoc(doc(FIREBASE_DB, "userInfo", user.email));
+                const data = userDoc.data();
+                const lastPlayedQuizId = data?.lastPlayedQuizId;
+
+                if (lastPlayedQuizId && lastPlayedQuizId !== "") {
+                    const quizDoc = await getDoc(doc(FIREBASE_DB, "quizzes", lastPlayedQuizId));
+                    const quizData = quizDoc.data();
+
+                    if (quizData) {
+                        setLastPlayedQuiz({
+                            id: lastPlayedQuizId,
+                            title: quizData.info.name,
+                            languageCode: quizData.info.languageCode,
+                        });
+                    }
+                } else {
+                    setLastPlayedQuiz(null);
+                }
+            }
+        };
+
+        fetchLastPlayedQuiz();
+    }, [user]);
+
     return (
         <>
             <Stack.Screen options={{headerShown:false}} />
@@ -128,39 +156,15 @@ const Home = () => {
                                 </CardTitle>
                             </CardHeader>
                             <CardContent>
-                                <View className="flex-col mt-4">
-                                    <Text className="text-2xl font-semibold text-primary mb-2">Continue your last lesson</Text>
-                                    <View className="flex-row items-center">
-                                        <Avatar alt="Quiz Picture" className="w-16 h-16 mr-4">
-                                            <AvatarFallback>
-                                                <Text className="text-4xl text-primary font-bold">Q</Text>
-                                            </AvatarFallback>
-                                        </Avatar>
-                                        <View className="flex-col ml-4">
-                                            <Text className="text-2xl font-semibold text-primary">Quiz Name</Text>
-                                            <TouchableOpacity>
-                                                <Text className="text-lg font-semibold text-primary/60 underline">Test your knowledge → </Text>
-                                            </TouchableOpacity>
-                                        </View>
-                                    </View>
-                                </View>
-
-                                <View className="flex-col mt-4">
-                                    <Text className="text-2xl font-semibold text-primary mb-2">Revisit an old Quiz</Text>
-                                    <View className="flex-row items-center">
-                                        <Avatar alt="Quiz Picture" className="w-16 h-16 mr-4">
-                                            <AvatarFallback>
-                                                <Text className="text-4xl text-primary font-bold">Q</Text>
-                                            </AvatarFallback>
-                                        </Avatar>
-                                        <View className="flex-col ml-4">
-                                            <Text className="text-2xl font-semibold text-primary">Quiz Name</Text>
-                                            <TouchableOpacity>
-                                                <Text className="text-lg font-semibold text-primary/60 underline">Test your knowledge → </Text>
-                                            </TouchableOpacity>
-                                        </View>
-                                    </View>
-                                </View>
+                                {lastPlayedQuiz ? (
+                                    <LastPlayedQuizCard
+                                        quizId={lastPlayedQuiz.id}
+                                        quizTitle={lastPlayedQuiz.title}
+                                        languageCode={lastPlayedQuiz.languageCode}
+                                    />
+                                ) : (
+                                    <Text className="text-xl font-semibold text-primary mt-2 mb-2">No recent quiz found. Go play a quiz!</Text>
+                                )}
                             </CardContent>
                         </Card>
                     </View>
