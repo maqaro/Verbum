@@ -11,24 +11,29 @@ import Headerspace from '~/components/HeaderSpace'
 import { FIREBASE_AUTH, FIREBASE_DB } from "~/FirebaseConfig";
 import { doc, getDoc, collection, getDocs } from "firebase/firestore";
 import { useFocusEffect } from "@react-navigation/native";
+import BadgeGrid from "~/components/BadgeGrid";
 
 const Profile = () => {
     const user = FIREBASE_AUTH.currentUser
     const [tabValue, setTabValue] = useState('badges');
     const [points, setPoints] = useState(0);
+    const [highestStreak, setHighestStreak] = useState(0);
     const [streak, setStreak] = useState(0);
     const [userName, setUserName] = useState('');
     const [avatar, setAvatar] = useState<string | undefined>(undefined);
     const [userRank, setUserRank] = useState<number | null>(null);
-
+    const [friends, setFriends] = useState<string[]>([]);
+    
     const getUserInfo = async () => {
         if (user?.email) {
             const userDoc = await getDoc(doc(FIREBASE_DB, "userInfo", user.email));
             const data = userDoc.data()
             setPoints(data?.points || 0);
             setStreak(data?.streakInfo.currentStreak)
+            setHighestStreak(data?.streakInfo.highestStreak)
             setAvatar(data?.avatar.uri || undefined);
             setUserName(data?.details.userName)
+            setFriends(data?.friends)
         }
     }
 
@@ -68,6 +73,56 @@ const Profile = () => {
             console.error("Error fetching users: ", error);
             return [];
         }
+    };
+
+    const generateBadges = () => {
+        const badges = [];
+
+        if (points > 1000) {
+            badges.push({ color: '#FFD700', label: 'Gold' });
+        } else if (points > 500) {
+            badges.push({ color: '#C0C0C0', label: 'Silver' });
+        } else if (points > 100) {
+            badges.push({ color: '#CD7F32', label: 'Bronze' });
+        }
+
+        if (points > 0) {
+            badges.push({ color: '#D708F5', label: 'First Points' });
+        }
+
+        if (highestStreak >= 10) {
+            badges.push({ color: '#FF0000', label: 'On Fire' });
+        } 
+        if (highestStreak >= 5) {
+            badges.push({ color: '#FF3000', label: 'Heating Up' });
+        } 
+        if (highestStreak >= 1) {
+            badges.push({ color: '#FF6000', label: 'Getting Started' });
+        }
+        if (friends.length >= 1) {
+            badges.push({ color: '#8389bc', label: 'First Friend' });
+        } 
+        if (friends.length >= 5) {
+            badges.push({ color: '#b46051', label: 'Getting Social' });
+        }
+        if (friends.length >= 10) {
+            badges.push({ color: '#1a263d', label: 'Social Butterfly' });
+        }
+
+        if (userRank && userRank <= 100) {
+            badges.push({ color: '#4B0082', label: 'Top 100' });
+        }
+        if (userRank && userRank <= 10) {
+            badges.push({ color: '#0b9d29', label: 'Top 10' });
+        }
+        if (userRank && userRank <= 3) {
+            badges.push({ color: '#CD7F32', label: 'Top 3' });
+        }
+        if (userRank && userRank <= 1) {
+            badges.push({ color: '#FFD700', label: 'Number 1' });
+        }
+
+        return badges;
     };
 
     return (
@@ -129,7 +184,7 @@ const Profile = () => {
                             </TabsTrigger>
                         </TabsList>
                         <TabsContent value='badges'>
-                            { /* to be finished */ }
+                            <BadgeGrid badges={generateBadges()} />
                         </TabsContent>
                         <TabsContent value='stats'>
                             { /* to be finished */ }
